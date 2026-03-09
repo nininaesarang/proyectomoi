@@ -23,7 +23,7 @@ a {text-align: center;}
                     <li><a href="#">Estado Financiero</a></li>
                     <li><a href="#">Club Escolar</a></li>
                     <li><a href="#">Servicio Social</a></li>
-                    <li><a href="#">Salir</a></li>
+                    <li><a href="logout.php">Salir</a></li>
                 </ul>
             </nav>
         </div>
