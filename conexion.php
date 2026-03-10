@@ -2,8 +2,8 @@
 $host = 'localhost';
 $dbname = 'escolar';
 $username = 'root';
-$password_db = 'typhlosion';
-$port = '3306';
+$password_db = 'tu contraseña';
+$port = '3306/3307';
 
 try {
     $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $username, $password_db);
