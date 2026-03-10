@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alumnos</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="../style.css">
 <style>
 h3 {text-align: center;}
 img {width: 100px;}
@@ -13,7 +13,7 @@ a {text-align: center;}
 </head>
     <header>
         <div class="header-container">
-            <img src="/img/logotec.png" alt="Instituto Tecnológico Superior de San Pedro">
+            <img src="../img/logotec.png" alt="Instituto Tecnológico Superior de San Pedro">
             <h1>Alumnos</h1>
             <nav>
                 <ul>
@@ -23,7 +23,7 @@ a {text-align: center;}
                     <li><a href="#">Estado Financiero</a></li>
                     <li><a href="#">Club Escolar</a></li>
                     <li><a href="#">Servicio Social</a></li>
-                    <li><a href="#">Salir</a></li>
+                    <li><a href="../logout.php">Salir</a></li>
                 </ul>
             </nav>
         </div>

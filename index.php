@@ -26,7 +26,7 @@ img {width: 100px;}
                     <img src="img/administrativo.jpg">
                     <div class="caption">
                         <h2>Administración</h2>
-                        <a href="#"">Ir al sistema</a>
+                        <a href="login.php?acceso=admin">Ir al sistema</a>
                     </div>
                 </div>
                 <input class="slide-open" type="radio" id="slide-2" name="slide" aria-hidden="true" hidden="">
@@ -34,7 +34,7 @@ img {width: 100px;}
                     <img src="img/docente.jpg">
                     <div class="caption">
                         <h2>Docentes</h2>
-                        <a href="#">Ir al sistema</a>
+                        <a href="login.php?acceso=docente">Ir al sistema</a>
                     </div>
                 </div>
                 <input class="slide-open" type="radio" id="slide-3" name="slide" aria-hidden="true" hidden="">
@@ -42,7 +42,7 @@ img {width: 100px;}
                     <img src="img/alumno.jpg">
                     <div class="caption">
                         <h2>Alumnos</h2>
-                        <a href="#">Ir al sistema</a>
+                        <a href="login.php?acceso=alumno">Ir al sistema</a>
                     </div>
                 </div>
                 <label for="slide-3" class="slide-control prev control-1"> ‹ </label>
