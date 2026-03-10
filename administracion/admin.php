@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docentes</title>
+    <title>Administrativo</title>
     <link rel="stylesheet" href="../style.css">
 <style>
 h3 {text-align: center;}
 img {width: 100px;}
 a {text-align: center;}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #c4c2c2;
+}
 </style>
 </head>
     <header>
