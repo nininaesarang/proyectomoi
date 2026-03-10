@@ -1,0 +1,16 @@
+# Ignorar archivo de conexión con credenciales reales
+conexion.php
+
+# Ignorar archivos de configuración del entorno
+.env
+config.php
+
+# Ignorar carpetas de dependencias (si llegas a usar Composer)
+/vendor/
+
+# Archivos temporales del sistema operativo
+Thumbs.db
+.DS_Store
+
+# Logs de errores que pueda generar XAMPP
+*.log
