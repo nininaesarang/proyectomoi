@@ -3,6 +3,19 @@
     if (isset($_GET['error'])) {
         $error = "Usuario o contraseña incorrectos. Intenta de nuevo.";
     }
+
+    $tipo_acceso = $_GET['acceso'] ?? 'alumno';
+
+    switch($tipo_acceso){
+        case 'admin':
+            $titulo = "Portal Administrativo";
+            break;
+        case 'docente':
+            $titulo = "Acceso a docentes";
+            break;
+        default:
+            $titulo = "Portal de alumnos";
+    }
 ?>
 
 <!DOCTYPE html>
@@ -39,6 +52,7 @@
             padding: 40px;
             width: 100%;
             max-width: 420px;
+            margin: 0 3%;
         }
 
         .header {
@@ -112,11 +126,41 @@
         .btn-submit:active {
             transform: translateY(0);
         }
+        img {width: 300px; display: flex;}
+
+        .message-box {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .error {
+            background-color: #fff5f5;
+            border: 1px solid #fc8181;
+            color: #c53030;
+        }
+        
+        .error ul { list-style-position: inside; }
+
+        .success {
+            background-color: #f0fff4;
+            border: 1px solid #68d391;
+            color: #2f855a;
+            text-align: center;
+        }
+        
     </style>
 </head>
 <body>
+
+    <div class="container header">
+        <h1><?php echo $titulo;?></h1> <br>
+        <img src="img/logotec.png" alt="Instituto Tecnológico Superior de San Pedro">
+    </div>
     <div class="container">
-        
+
         <div class="header">
             <h1>Iniciar sesión</h1>
             <p>Completa el formulario para iniciar sesión</p>
@@ -127,11 +171,11 @@
                 <p style="color: red; text-align: center;"><?php echo $error; ?></p>
             <?php endif; ?>
             <div class="form-group">
-                <label for="email">Correo Electrónico</label>
+                <label for="correo">Correo Electrónico</label>
                 <input 
                     type="text" 
-                    id="email" 
-                    name="email" 
+                    id="correo" 
+                    name="correo" 
                     placeholder="ejemplo@correo.com"
                 >
             </div>

@@ -3,7 +3,7 @@ $host = 'localhost';
 $dbname = 'escolar';
 $username = 'root';
 $password_db = 'typhlosion';
-$port = '3307';
+$port = '3306';
 
 try {
     $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $username, $password_db);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alumnos</title>
+    <title>Docentes</title>
     <link rel="stylesheet" href="../style.css">
 <style>
 h3 {text-align: center;}
@@ -14,15 +14,15 @@ a {text-align: center;}
     <header>
         <div class="header-container">
             <img src="../img/logotec.png" alt="Instituto Tecnológico Superior de San Pedro">
-            <h1>Alumnos</h1>
+            <h1>Administrativo</h1>
             <nav>
                 <ul>
                     <li><a href="#" class="active">Inicio</a></li>
-                    <li><a href="#">Perfil</a></li>
-                    <li><a href="#">Horarios</a></li>
-                    <li><a href="#">Estado Financiero</a></li>
-                    <li><a href="#">Club Escolar</a></li>
-                    <li><a href="#">Servicio Social</a></li>
+                    <li><a href="#">Actividad 1</a></li>
+                    <li><a href="#">Actividad 2</a></li>
+                    <li><a href="#">Actividad 3</a></li>
+                    <li><a href="#">Actividad 4</a></li>
+                    <li><a href="#">Actividad 5</a></li>
                     <li><a href="../logout.php">Salir</a></li>
                 </ul>
             </nav>
@@ -31,9 +31,9 @@ a {text-align: center;}
 
     <main class="main-content">
         <div class="table-container">
-            <h1 style="text-align: center;">Aula Virtual</h1>
-            <h2 style="text-align: center;">Nota: El profesor lo añadirá a su clase.</h2>
-            <h3 style="text-align: center;">Acceso al aula virtual: <a class="btn-dashboard btn-opcion" href="https://classroom.google.com/">Aula virtual</a></h3>
+            <h1 style="text-align: center;">Plantilla</h1>
+            <h2 style="text-align: center;">Insertar texto</h2>
+            <h3 style="text-align: center;">Insertar descripción <a class="btn-dashboard btn-opcion" href="#">Botón 1</a></h3>
         </div>
     </main>
 </body>

@@ -2,28 +2,38 @@
 session_start();
 include 'conexion.php';
 
+$correo = $_POST['correo'] ?? '';
+$password = $_POST['password'] ?? '';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($correo && $password) {
 
-    $email = filter_var(trim($_POST['correo']), FILTER_SANITIZE_EMAIL);
-    $password_form = $_POST['password'];
-    $sql = "SELECT id, password, rol FROM usuarios WHERE correo = :correo";
+    $sql = "SELECT id_usuario, password, rol FROM usuarios WHERE correo = ?";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':correo', $email, PDO::PARAM_STR);
-    $stmt->execute();
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->execute([$correo]);
+    $usuario = $stmt->fetch();
 
 
     if ($usuario) {
         
         $password_bd = $usuario['password'];
+        $_SESSION['id_usuario'] = $usuario['id_usuario'];
+        $_SESSION['rol'] = $usuario['rol'];
 
-        if ($usuario && password_verify($password_form, $usuario['password'])) {
-            $_SESSION['user_id'] = $usuario['id'];
-        $_SESSION['user_rol'] = $usuario['rol'];
-
-        header("Location: alumnos.php");
-        exit;}
+        switch($usuario['rol'])
+        {
+            case 'administrativo':
+                header("Location: administracion/admin.php");
+                break;
+            case 'docente':
+                header("Location: docentes/docentes.php");
+                break;
+            case 'alumno':
+                header("Location: alumnos/alumnos.php");
+                break;
+            default:
+                header("Location: login.php?error=rol_desconocido");
+        }
+        exit;
     } else {
         header("Location: login.php?error=1");
         exit;
@@ -33,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $pdo = null;
 
 } else {
-    header("Location: login.php");
+    header("Location: login.php?error=campos_vacios");
     exit;
 }
 ?>
