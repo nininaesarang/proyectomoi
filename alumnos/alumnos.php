@@ -56,7 +56,8 @@ body {
                 <ul>
                     <li><a href="#" class="active">Aula Virtual</a></li>
                     <li><a href="perfil.php">Perfil</a></li>
-                    <li><a href="horarios.php">Horarios</a></li>
+                    <li><a href="horarios.php">Horario</a></li>
+                    <li><a href="calificaciones.php">Calificaciones</a></li>
                     <li><a href="finanzas.php">Estado Financiero</a></li>
                     <li><a href="club.php">Club Escolar</a></li>
                     <li><a href="servicio.php">Servicio Social</a></li>
@@ -102,7 +103,7 @@ body {
                 </tbody>
             </table>
             <br>
-            <h3>Acceso al aula virtual: <a class="btn-dashboard btn-opcion" href="https://classroom.google.com/">Aula virtual</a></h3>
+            <h3>Acceso al aula virtual: <a class="btn-dashboard btn-opcion" href="https://classroom.google.com/">Acceder</a></h3>
             <br>
             <label class="form-container form-group" style="display: block; text-align: center;"><strong>Nota: El profesor lo añadirá a su clase.</strong></label>
         </div>

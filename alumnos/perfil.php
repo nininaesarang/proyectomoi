@@ -67,7 +67,8 @@ body {
                 <ul>
                     <li><a href="alumnos.php" class="active">Aula Virtual</a></li>
                     <li><a href="#">Perfil</a></li>
-                    <li><a href="horarios.php">Horarios</a></li>
+                    <li><a href="horarios.php">Horario</a></li>
+                    <li><a href="calificaciones.php">Calificaciones</a></li>
                     <li><a href="finanzas.php">Estado Financiero</a></li>
                     <li><a href="club.php">Club Escolar</a></li>
                     <li><a href="servicio.php">Servicio Social</a></li>
