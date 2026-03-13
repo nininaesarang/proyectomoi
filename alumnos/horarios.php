@@ -147,6 +147,7 @@ date_default_timezone_set('America/Mexico_City');
                             </tbody>
                         </table>
                     </div>
+                    <br>
                 <?php endforeach; ?>
             </div>    
         </div>

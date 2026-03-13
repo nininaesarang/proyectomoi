@@ -95,7 +95,7 @@ body {
             <h1 style="text-align: center;">Estado Financiero</h1>
 
             <div class="form-group"">
-                <label for="select-filter">Ver pagos pendientes:</label>
+                <label for="select-filter">Ver pagos:</label>
                 <select onchange="vista()" id="select-filter">
                     <option value="section-real">Realizados</option>
                     <option value="section-pen">Pendientes</option>
@@ -128,7 +128,7 @@ body {
                             <?php endforeach;?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="3" style="text-align: center;">No has realizado ningun pago.</td>
+                                <td colspan="5" style="text-align: center;">No has realizado ningun pago.</td>
                             </tr>
                         <?php endif;?>
                     </tbody>
@@ -159,7 +159,7 @@ body {
                             <?php endforeach;?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="3" style="text-align: center;">No tienes pagos pendientes.</td>
+                                <td colspan="5" style="text-align: center;">No tienes pagos pendientes.</td>
                             </tr>
                         <?php endif;?>
                     </tbody>

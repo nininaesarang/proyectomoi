@@ -107,7 +107,7 @@ date_default_timezone_set('America/Mexico_City');
                 <div class="error-message"><?php echo $error_message; ?></div>
             <?php endif; ?>
 
-            <h1 style="text-align: center;">Calificaciones y kardex</h1>
+            <h1 style="text-align: center;">Calificaciones y Kardex</h1>
             <br>
             <div class="form-group">
                 <?php if(!empty($calif)): ?>
@@ -117,7 +117,7 @@ date_default_timezone_set('America/Mexico_City');
             </div>
             
             <div class="form-group"">
-                <label for="select-filter">Ver calificaiones o kardex:</label>
+                <label for="select-filter">Ver:</label>
                 <select onchange="vista()" id="select-filter">
                     <option value="section-calif">Calificaciones</option>
                     <option value="section-kardex">Kardex</option>
@@ -126,7 +126,7 @@ date_default_timezone_set('America/Mexico_City');
             </div>
 
             <div id="section-calif" class="form-container main-view">
-                <h2>Calificaciones parciales</h2>
+                <h2>Calificaciones Parciales</h2>
                 <table class="history-table">
                     <thead>
                         <tr>
@@ -159,7 +159,7 @@ date_default_timezone_set('America/Mexico_City');
                             <?php endforeach;?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="3" style="text-align: center;">No han subido calificaciones.</td>
+                                <td colspan="9" style="text-align: center;">No han subido calificaciones.</td>
                             </tr>
                         <?php endif;?>
                     </tbody>
@@ -192,7 +192,7 @@ date_default_timezone_set('America/Mexico_City');
                             <?php endforeach;?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="" style="text-align: center;">No tienes un kardex aún.</td>
+                                <td colspan="5" style="text-align: center;">No tienes un kardex aún.</td>
                             </tr>
                         <?php endif;?>
                     </tbody>
