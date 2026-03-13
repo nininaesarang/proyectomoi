@@ -192,7 +192,7 @@ date_default_timezone_set('America/Mexico_City');
                             <?php endforeach;?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="3" style="text-align: center;">No tienes un kardex aún.</td>
+                                <td colspan="" style="text-align: center;">No tienes un kardex aún.</td>
                             </tr>
                         <?php endif;?>
                     </tbody>
