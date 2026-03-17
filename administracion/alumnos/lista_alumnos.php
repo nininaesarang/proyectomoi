@@ -56,7 +56,7 @@ try {
 
     <main class="main-content">
         <div class="table-container" style="max-width: 1100px;">
-            <h2>Padrón Oficial de Alumnos</h2>
+            <h2>Panel de Alumnos</h2>
 
             <table class="history-table">
                 <thead>
