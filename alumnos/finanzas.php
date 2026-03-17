@@ -18,10 +18,11 @@ try{
     fa.concepto_pago,
     fa.fecha_vencimiento,
     fa.pagado,
-    fa.referencia_bancaria
+    fa.referencia_bancaria,
+    fa.monto
     FROM
     alumnos a
-    inner join
+    left join
     finanzas_adeudos fa on a.id_alumno = fa.id_alumno
     WHERE a.id_usuario = ?
     ORDER BY fa.fecha_vencimiento ASC";
@@ -110,6 +111,7 @@ body {
                         <tr>
                             <th>Matrícula</th>
                             <th>Concepto de pago</th>
+                            <th>Monto</th>
                             <th>Fecha de vencimiento</th>
                             <th>Pagado</th>
                             <th>Referencia Bancaria</th>
@@ -121,6 +123,7 @@ body {
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['matricula']);?></td>
                                     <td><?php echo htmlspecialchars($row['concepto_pago']);?></td>
+                                    <td><?php echo "$" . htmlspecialchars($row['monto']);?></td>
                                     <td><?php echo date('d-m-Y', strtotime($row['fecha_vencimiento']));?></td>
                                     <td><?php echo htmlspecialchars($row['pagado']);?></td>
                                     <td><?php echo htmlspecialchars($row['referencia_bancaria']);?></td>
@@ -128,7 +131,7 @@ body {
                             <?php endforeach;?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" style="text-align: center;">No has realizado ningun pago.</td>
+                                <td colspan="6" style="text-align: center;">No has realizado ningun pago.</td>
                             </tr>
                         <?php endif;?>
                     </tbody>
@@ -141,6 +144,7 @@ body {
                         <tr>
                             <th>Matrícula</th>
                             <th>Concepto de pago</th>
+                            <th>Monto</th>
                             <th>Fecha de vencimiento</th>
                             <th>Pagado</th>
                             <th>Referencia Bancaria</th>
@@ -152,14 +156,15 @@ body {
                                 <tr>
                                     <td><?php echo htmlspecialchars($row_p['matricula']);?></td>
                                     <td><?php echo htmlspecialchars($row_p['concepto_pago']);?></td>
-                                    <td><?php echo date('d-m-Y', strtotime($row['fecha_vencimiento']));?></td>
+                                    <td><?php echo "$" . htmlspecialchars($row_p['monto']);?></td>
+                                    <td><?php echo date('d-m-Y', strtotime($row_p['fecha_vencimiento']));?></td>
                                     <td><?php echo htmlspecialchars($row_p['pagado']);?></td>
                                     <td><?php echo htmlspecialchars($row_p['referencia_bancaria']);?></td>
                                 </tr>
                             <?php endforeach;?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" style="text-align: center;">No tienes pagos pendientes.</td>
+                                <td colspan="6" style="text-align: center;">No tienes pagos pendientes.</td>
                             </tr>
                         <?php endif;?>
                     </tbody>
