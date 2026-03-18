@@ -1,6 +1,7 @@
 <?php
 session_start();
 require '../conexion.php';
+require 'header_alumno.php';
 
 if(!isset($_SESSION['id_usuario'])){
     header("Location: ../login.php");
@@ -18,14 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt_id = $pdo->prepare("SELECT id_alumno FROM alumnos WHERE id_usuario = ?");
             $stmt_id->execute([$id_logueado]);
             $alumno = $stmt_id->fetch(PDO::FETCH_ASSOC);
-            $id_alumno_real = $alumno['id_alumno'] ?? null;
+            $id_alumno = $alumno['id_alumno'] ?? null;
 
-            if ($id_alumno_real) {
+            if ($id_alumno) {
                 $pdo->beginTransaction();
                 
                 $sql = "UPDATE actividades_complementarias SET nombre_actividad = ? WHERE id_alumno = ?";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$reinscripcion, $id_alumno_real]);
+                $stmt->execute([$reinscripcion, $id_alumno]);
                 
                 $pdo->commit();
                 header("Location: club.php?msg=actualizado_exitoso");
@@ -89,7 +90,9 @@ try {
                     <li><a href="calificaciones.php">Calificaciones</a></li>
                     <li><a href="finanzas.php">Estado Financiero</a></li>
                     <li><a href="#">Club Escolar</a></li>
+                    <?php if (isset($_SESSION['id_usuario']) && $_SESSION['rol'] == 'alumno' && $tiene_registro_ss): ?>
                     <li><a href="servicio.php">Servicio Social</a></li>
+                    <?php endif; ?>
                     <li><a href="../logout.php">Salir</a></li>
                 </ul>
             </nav>

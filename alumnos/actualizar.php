@@ -1,6 +1,7 @@
 <?php
 session_start();
 require '../conexion.php';
+require 'header_alumno.php';
 
 if(!isset($_SESSION['id_usuario'])){
     header("Location: ../login.php");
@@ -84,7 +85,9 @@ try {
                     <li><a href="calificaciones.php">Calificaciones</a></li>
                     <li><a href="finanzas.php">Estado Financiero</a></li>
                     <li><a href="club.php">Club Escolar</a></li>
+                    <?php if (isset($_SESSION['id_usuario']) && $_SESSION['rol'] == 'alumno' && $tiene_registro_ss): ?>
                     <li><a href="servicio.php">Servicio Social</a></li>
+                    <?php endif; ?>
                     <li><a href="../logout.php">Salir</a></li>
                 </ul>
             </nav>
@@ -110,9 +113,11 @@ try {
             <br> <br>
             <label>Teléfono:</label> 
             <input type="text" name="telefono" required maxlength="10" value="<?php echo htmlspecialchars($perfil['telefono']); ?>">
+            <small>Ingresa 10 dígitos. Ejemplo: 1234567890</small>
             <br><br>
             <label>Correo:</label> 
             <input type="email" name="correo" required value="<?php echo htmlspecialchars($perfil['correo']); ?>">
+            <small>Ingresa el formato ejemplo@dominio.com</small>
             <br><br>
             <label>Estado: </label>
             <input type="text" id="estatus" name="estatus" value="<?php echo htmlspecialchars($perfil['estatus']);?>" readonly>

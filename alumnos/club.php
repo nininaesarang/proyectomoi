@@ -1,6 +1,7 @@
 <?php
 session_start();
 require '../conexion.php';
+require 'header_alumno.php';
 
 $id_logueado = $_SESSION['id_usuario'];
 $error_message = null;
@@ -40,7 +41,7 @@ catch(PDOException $e){
     <title>Alumnos - Club Escolar</title>
     <link rel="stylesheet" href="../style.css">
 <style>
-h3 {text-align: center;}
+h1, h3 {text-align: center;}
 img {width: 100px;}
 a {text-align: center;}
 body {
@@ -63,7 +64,9 @@ body {
                     <li><a href="calificaciones.php">Calificaciones</a></li>
                     <li><a href="finanzas.php">Estado Financiero</a></li>
                     <li><a href="#">Club Escolar</a></li>
+                    <?php if (isset($_SESSION['id_usuario']) && $_SESSION['rol'] == 'alumno' && $tiene_registro_ss): ?>
                     <li><a href="servicio.php">Servicio Social</a></li>
+                    <?php endif; ?>
                     <li><a href="../logout.php">Salir</a></li>
                 </ul>
             </nav>
@@ -74,7 +77,7 @@ body {
         <?php if ($error_message): ?>
                 <div class="error-message"><?php echo $error_message; ?></div>
         <?php endif; ?>
-        <div class="form-container form-group">
+        <div class="form-container">
             <h1>Datos personales</h1>
             <div class=" form-container form-group">
                 <label>Matrícula:</label>

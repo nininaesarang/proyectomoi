@@ -1,6 +1,7 @@
 <?php
 session_start();
 require '../conexion.php';
+require 'header_alumno.php';
 
 $message = null;
 $error_message = null;
@@ -80,7 +81,9 @@ body {
                     <li><a href="calificaciones.php">Calificaciones</a></li>
                     <li><a href="#">Estado Financiero</a></li>
                     <li><a href="club.php">Club Escolar</a></li>
+                    <?php if (isset($_SESSION['id_usuario']) && $_SESSION['rol'] == 'alumno' && $tiene_registro_ss): ?>
                     <li><a href="servicio.php">Servicio Social</a></li>
+                    <?php endif; ?>
                     <li><a href="../logout.php">Salir</a></li>
                 </ul>
             </nav>
