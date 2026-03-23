@@ -2,7 +2,7 @@
 $host = 'localhost';
 $dbname = 'escolar';
 $username = 'root';
-$password_db = 'lyndamariadb';
+$password_db = 'typhlosion';
 $port = '3306';
 
 try {

@@ -7,7 +7,7 @@
     $tipo_acceso = $_GET['acceso'] ?? 'alumno';
 
     switch($tipo_acceso){
-        case 'admin':
+        case 'administrativo':
             $titulo = "Portal Administrativo";
             break;
         case 'docente':
@@ -15,6 +15,7 @@
             break;
         default:
             $titulo = "Portal de alumnos";
+            break;
     }
 ?>
 
@@ -154,7 +155,6 @@
     </style>
 </head>
 <body>
-
     <div class="container header">
         <h1><?php echo $titulo;?></h1> <br>
         <img src="img/logotec.png" alt="Instituto Tecnológico Superior de San Pedro">
@@ -170,6 +170,7 @@
             <?php if ($error): ?>
                 <p style="color: red; text-align: center;"><?php echo $error; ?></p>
             <?php endif; ?>
+            <input type="hidden" name="rol" value="<?php echo $tipo_acceso;?>">
             <div class="form-group">
                 <label for="correo">Correo Electrónico</label>
                 <input 

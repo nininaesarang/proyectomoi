@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="style.css">
 <style>
 img {width: 100px;}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #c4c2c2;
+}
 </style>
 </head>
     <header>
@@ -26,7 +32,7 @@ img {width: 100px;}
                     <img src="img/administrativo.jpg">
                     <div class="caption">
                         <h2>Administración</h2>
-                        <a href="login.php?acceso=admin">Ir al sistema</a>
+                        <a href="login.php?acceso=administrativo">Ir al sistema</a>
                     </div>
                 </div>
                 <input class="slide-open" type="radio" id="slide-2" name="slide" aria-hidden="true" hidden="">
