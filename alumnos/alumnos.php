@@ -110,7 +110,7 @@ body {
             <br>
             <label class="form-container form-group" style="display: block; text-align: center;"><strong>Nota: El profesor lo añadirá a su clase.</strong></label>
             <br>
-            <h3>Comentarios del profesor: <a class="btn-dashboard btn-historial" href="comentarios.php">Comentarios</a></h3>
+            <h3>Comentarios del profesor: <a class="btn-dashboard btn-primary" href="comentarios.php">Acceder</a></h3>
         </div>
         
     </main>
