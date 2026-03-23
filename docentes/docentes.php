@@ -18,11 +18,11 @@ a {text-align: center;}
             <nav>
                 <ul>
                     <li><a href="#" class="active">Inicio</a></li>
-                    <li><a href="#">Actividad 1</a></li>
-                    <li><a href="#">Actividad 2</a></li>
-                    <li><a href="#">Actividad 3</a></li>
-                    <li><a href="#">Actividad 4</a></li>
-                    <li><a href="#">Actividad 5</a></li>
+                    <li><a href="gestion_academica.php">Gestión Académica</a></li>
+                    <li><a href="gestion_calificaciones.php">Gestión de Calificaciones</a></li>
+                    <li><a href="asistencias.php">Control de Asistencias</a></li>
+                    <li><a href="aula_virtual.php">Aula Virtual</a></li>
+                    <li><a href="seg_academico.php">Seguimiento Académico</a></li>
                     <li><a href="../logout.php">Salir</a></li>
                 </ul>
             </nav>
