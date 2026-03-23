@@ -7,9 +7,8 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
 
 include '../conexion.php';
 
-// ==========================================
+
 // 1. CONSULTAS PARA LAS TARJETAS DE CONTEO
-// ==========================================
 try {
     $total_alumnos = $pdo->query("SELECT COUNT(*) FROM alumnos WHERE estatus = 'Activo'")->fetchColumn();
     $total_docentes = $pdo->query("SELECT COUNT(*) FROM docentes WHERE estatus = 'Activo'")->fetchColumn();
@@ -19,9 +18,7 @@ try {
     echo "Error en los contadores: " . $e->getMessage();
 }
 
-// ==========================================
 // 2. CONSULTA PARA LA LISTA DE GRUPOS
-// ==========================================
 try {
     $sql_grupos = "SELECT g.nombre_grupo, c.nombre_periodo, 
                    (SELECT COUNT(*) FROM alumnos a WHERE a.id_grupo = g.id_grupo AND a.estatus = 'Activo') as cantidad_alumnos

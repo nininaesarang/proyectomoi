@@ -33,17 +33,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// ==========================================
+
 // CONSULTAS PARA LLENAR LOS DESPLEGABLES
-// ==========================================
 $docentes = $pdo->query("SELECT id_docente, nombre_completo FROM docentes WHERE estatus = 'Activo'")->fetchAll();
 $materias = $pdo->query("SELECT id_materia, nombre_materia FROM materias")->fetchAll();
 $grupos = $pdo->query("SELECT id_grupo, nombre_grupo FROM grupos")->fetchAll();
 $ciclos = $pdo->query("SELECT id_ciclo, nombre_periodo FROM ciclos_escolares WHERE activo = 'Sí'")->fetchAll();
 
-// ==========================================
+
 // CONSULTA PARA VER LAS ASIGNACIONES ACTUALES
-// ==========================================
 try {
     $sql_cargas = "SELECT ca.id_carga_academica, d.nombre_completo, m.nombre_materia, g.nombre_grupo, c.nombre_periodo 
                    FROM carga_academica ca
