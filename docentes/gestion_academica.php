@@ -5,21 +5,22 @@ session_start();
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <header>
-        <div class="header-container">
-            <img src="img/logotec.png" alt="Instituto Tecnológico Superior de San Pedro">
-            <h1>Gestión Académica</h1>
-        </div>
-    </header>
+
 <meta charset="UTF-8">
-<title>Gestión Académica</title>
+<title>Docentes - Gestión Académica</title>
 <link rel="stylesheet" href="../style.css">
-
 <style>
+h3, h1 {text-align: center;}
+img {width: 100px;}
+a {text-align: center;}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #c4c2c2;
+}
 
-/* Haber q tal disenito*/
-
-
+/* Haber q tal diseñito*/
 .opciones{
     display:flex;
     justify-content:center;
@@ -74,63 +75,57 @@ session_start();
     background-color: #771313;
 }
 
-
-/* Botón volver */
-li{
-    list-style: none;
-    text-align: center;
-    margin-top: 30px;
-}
-
-li a{
-    text-decoration: none;
-    background-color: #6c757d;
-    color: white;
-    padding: 10px 18px;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-li a:hover{
-    background-color: #5a6268;
-}
-
 </style>
-
 </head>
-
 <body>
+    <header>
+        <div class="header-container">
+            <img src="../img/logotec.png" alt="Instituto Tecnológico Superior de San Pedro">
+            <h1>Docentes</h1>
+            <nav>
+                <ul>
+                    <li><a href="docentes.php">Inicio</a></li>
+                    <li><a href="#">Gestión Académica</a></li>
+                    <li><a href="gestion_calificaciones.php">Gestión de Calificaciones</a></li>
+                    <li><a href="asistencias.php">Control de Asistencias</a></li>
+                    <li><a href="aula_virtual.php">Aula Virtual</a></li>
+                    <li><a href="seg_academico.php">Seguimiento Académico</a></li>
+                    <li><a href="../logout.php">Salir</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+<main class="main-content">
+    <div class="table-container">
+        <h1>Gestión Académica</h1>
+        <div class="opciones">
+            <div class="seccion">
+                <h3>Grupos asignados</h3>
+                <p>Ver los grupos y materias asignadas.</p>
+                <a href="grupos.php">Consultar</a>
+            </div>
 
-<h2 style="text-align:center;">Gestión Académica</h2>
+            <div class="seccion">
+                <h3>Horario</h3>
+                <p>Consultar el horario semanal.</p>
+                <a href="horario.php">Consultar</a>
+            </div>
 
-<div class="opciones">
+            <div class="seccion">
+            <h3>Lista de alumnos</h3>
+            <p>Ver alumnos inscritos por grupo.</p>
+            <a href="alumnos_grupo.php">Consultar</a>
+            </div>
 
-<div class="seccion">
-<h3>Grupos asignados</h3>
-<p>Ver los grupos y materias asignadas.</p>
-<a href="grupos.php">Consultar</a>
-</div>
+        </div>
 
-<div class="seccion">
-<h3>Horario</h3>
-<p>Consultar el horario semanal.</p>
-<a href="horario.php">Consultar</a>
-</div>
+        <br>
 
-<div class="seccion">
-<h3>Lista de alumnos</h3>
-<p>Ver alumnos inscritos por grupo.</p>
-<a href="alumnos_grupo.php">Consultar</a>
-</div>
-
-</div>
-
-<br>
-
-<br>
-
-<li><a href="docentes.php">Volver</a></li>
-
+        <br>
+        <div style="text-align: center;">
+            <a class="btn-dashboard btn-historial" href="docentes.php">Volver</a>
+        </div> 
+    </div>
+</main>
 </body>
 </html>

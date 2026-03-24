@@ -103,9 +103,7 @@ try {
                 </tbody>
             </table>
             <br>
-            <div style="text-align: center;">
-                <a class="btn-dashboard btn-historial" href="alumnos.php">Volver al Aula Virtual</a>
-            </div>
+            <a class="btn-dashboard btn-historial" href="alumnos.php">Volver al Aula Virtual</a>
         </div>
     </main>
 </body>

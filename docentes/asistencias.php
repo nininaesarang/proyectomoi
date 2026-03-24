@@ -2,9 +2,6 @@
 session_start();
 require '../conexion.php';
 
-
-
-//se guarada el q inicio sesion en la vriable
 $id_usuario = $_SESSION['id_usuario'];
 
 $sql_docente = "SELECT id_docente FROM docentes WHERE id_usuario = ?";
@@ -26,16 +23,11 @@ JOIN carga_academica ON carga_academica.id_grupo = alumnos.id_grupo
 WHERE carga_academica.id_docente = ?
 ORDER BY alumnos.semestre_actual, alumnos.matricula";
 
-
-
-
 $stmt = $pdo->prepare($sql_alumnos);
 $stmt->execute([$id_docente]);
 $alumnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
 //mandar la asistencia
-
  //hacer clic
 if(isset($_POST['guardar_asistencia'])){
     //assitencitas por dia
@@ -100,51 +92,23 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
     ];
 }
 ?>
-
-
-
-<h2 style="text-align:center; color:#000000;">Registro de Asistencias</h2>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docentes - Control de Asistencias</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
 <style>
-/* Tabla */
-table {
-    width: 90%;
-    margin: 30px auto;
-    border-collapse: collapse;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    border-radius: 2px;
-    overflow: hidden;
-    background-color: #ffffff;
+h3, h1 {text-align: center;}
+img {width: 100px;}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #c4c2c2;
 }
-
-/* titulito */
-th {
-    background-color: #d53333;
-    color: white;
-    font-size: 16px;
-    padding: 12px 15px;
-    text-align: center;
-}
-
-/* Filas */
-td {
-    padding: 12px 15px;
-    text-align: center;
-    color: #555;
-    font-size: 14px;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-
-
-
-select {
-    padding: 6px 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-/* Botón guardar */
 input[type="submit"] {
     display: block;
     margin: 20px auto;
@@ -157,72 +121,71 @@ input[type="submit"] {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-
-input[type="submit"]:hover {
-    background-color: #5a0b09;
-}
-
-/* Botón volver */
-li{
-    list-style: none;
-    text-align: center;
-    margin-top: 30px;
-}
-
-li a{
-    text-decoration: none;
-    background-color: #6c757d;
-    color: white;
-    padding: 10px 18px;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-li a:hover{
-    background-color: #5a6268;
-}
 </style>
-
-
-<h2>Registro de Asistencias</h2>
-<form method="post">
-<input type="hidden" name="id_carga_academica" value="<?= $id_carga ?>">
-<table border="1" cellpadding="5" cellspacing="0">
-<tr>
-    <th>Alumno</th>
-    <th>Matricula</th>
-    <th>Semestre</th>
-    <th>Asistencia</th>
-    <th>Historial</th>
-    <th>Estado</th>
-</tr>
-
-<?php foreach($alumnos as $alumno): 
-    $id_al = $alumno['id_alumno'];
-    $hist = $historial[$id_al] ?? ['faltas'=>0,'retardos'=>0,'porcentaje'=>100,'estado'=>'Normal'];
-?>
-<tr>
-    <td><?= $alumno['correo'] ?></td>
-    <td><?= $alumno['matricula'] ?></td>
-    <td><?= $alumno['semestre_actual'] ?></td>
-    <td>
-        <select name="asistencia[<?= $id_al ?>]">
-            <option value="Asistió">Asistió</option>
-            <option value="Faltó">Faltó</option>
-            <option value="Retardo">Retardo</option>
-        </select>
-    </td>
-    <td>
-        <?= "Faltas: ".$hist['faltas']." | Retardos: ".$hist['retardos']." | Asistencia: ".$hist['porcentaje']."%" ?>
-    </td>
-    <td><?= $hist['estado'] ?></td>
-</tr>
-<?php endforeach; ?>
-</table>
-<br>
-<input type="submit" name="guardar_asistencia" value="Guardar Asistencias">
-</form>
-
-
-<li><a href="docentes.php">Volver</a></li>
+<body>
+        <header>
+        <div class="header-container">
+            <img src="../img/logotec.png" alt="Instituto Tecnológico Superior de San Pedro">
+            <h1>Docentes</h1>
+            <nav>
+                <ul>
+                    <li><a href="docentes.php">Inicio</a></li>
+                    <li><a href="gestion_academica.php">Gestión Académica</a></li>
+                    <li><a href="gestion_calificaciones.php">Gestión de Calificaciones</a></li>
+                    <li><a href="#">Control de Asistencias</a></li>
+                    <li><a href="aula_virtual.php">Aula Virtual</a></li>
+                    <li><a href="seg_academico.php">Seguimiento Académico</a></li>
+                    <li><a href="../logout.php">Salir</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="table-container">
+            <h1>Registro de Asistencias</h1>
+            <form method="post" class="form-container form-group">
+                <input type="hidden" name="id_carga_academica" value="<?= $id_carga ?>">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Alumno</th>
+                            <th>Matricula</th>
+                            <th>Semestre</th>
+                            <th>Asistencia</th>
+                            <th>Historial</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($alumnos as $alumno): 
+                    $id_al = $alumno['id_alumno'];
+                    $hist = $historial[$id_al] ?? ['faltas'=>0,'retardos'=>0,'porcentaje'=>100,'estado'=>'Normal'];
+                ?>
+                <tr>
+                    <td><?= $alumno['correo'] ?></td>
+                    <td><?= $alumno['matricula'] ?></td>
+                    <td><?= $alumno['semestre_actual'] ?></td>
+                    <td>
+                        <select name="asistencia[<?= $id_al ?>]">
+                            <option value="Asistió">Asistió</option>
+                            <option value="Faltó">Faltó</option>
+                            <option value="Retardo">Retardo</option>
+                        </select>
+                    </td>
+                    <td>
+                        <?= "Faltas: ".$hist['faltas']." | Retardos: ".$hist['retardos']." | Asistencia: ".$hist['porcentaje']."%" ?>
+                    </td>
+                    <td><?= $hist['estado'] ?></td>
+                </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </form>
+            <input class="form-group" type="submit" name="guardar_asistencia" value="Guardar Asistencias">
+            <div style="text-align: right;">
+                <a class= "btn-dashboard btn-historial" href="docentes.php">Volver</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

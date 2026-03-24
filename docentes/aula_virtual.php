@@ -5,10 +5,7 @@ require '../conexion.php';
 // id de quien iniicio esion
 $id_usuario = $_SESSION['id_usuario'];
 
-
- // biscar docentito consultita
-
-
+ // buscar docentito consultita
 $stmtDocente = $pdo->prepare("SELECT id_docente FROM docentes WHERE id_usuario = ?");
 $stmtDocente->execute([$id_usuario]);
 $docente = $stmtDocente->fetch(PDO::FETCH_ASSOC);
@@ -37,7 +34,7 @@ if(isset($_POST['subir'])) {
         $stmtCarga->execute([$id_docente]);
         $carga = $stmtCarga->fetch(PDO::FETCH_ASSOC);
 
-        //guardamso
+        //guardamos
         if($carga) {
             $id_carga_academica = $carga['id_carga_academica'];
 
@@ -68,64 +65,46 @@ $stmt->execute([$id_carga_academica]);
 $materiales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Aula Virtual</title>
-    <style>
-        body {
-    font-family: times new roman, serif;
-    padding: 20px;
-    background-color: #f5f5f5;
+    <title>Docentes - Aula Virtual</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<style>
+h3, h1 {text-align: center;}
+img {width: 100px;}
+a {text-align: center;}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #c4c2c2;
 }
-
-/* Títulos */
-h2, h3 {
-    color: #d53333;
-    text-align: center;
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
 }
-
-/* Formulario para subir la tareita*/
-.formulario {
-    background-color: #ffffff;
-    border-radius: 5px;
-    padding: 20px;
-    width: 400px;
-    margin: 20px auto;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  
-}
-
-
-
-.formulario input[type="text"],
-.formulario input[type="file"],
-.formulario input[type="datetime-local"] {
-    width: 100%;
-    padding: 8px 10px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-}
-
-.formulario button {
-    background-color: #a92d29;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
+.inputfile + label {
+    font-size: auto;
     font-weight: bold;
-    cursor: pointer;
+    color: white;
+    background-color:  #de2720;
     transition: background-color 0.3s ease;
+    display: inline-block;
+    border-radius: 5px;
+    padding: 12px 20px;
+    cursor: pointer;
 }
-
-.formulario button:hover {
-    background-color: #5a0b09;
+.inputfile:focus + label,
+.inputfile + label:hover {
+    background-color: #a11915;
 }
-
 /* tareita actual */
 .tarea {
     background-color: #ffffff;
@@ -137,8 +116,6 @@ h2, h3 {
     transition: transform 0.2s ease;
 }
 
-
-
 /* Enlaces dentro de tarjeta */
 .tarea a {
     color: #490806;
@@ -146,33 +123,31 @@ h2, h3 {
     font-weight: bold;
 }
 
-
-/* Botón volver */
-li {
-    list-style: none;
-    text-align: center;
-    margin-top: 30px;
-}
-
-li a {
-    text-decoration: none;
-    background-color: #6c757d;
-    color: white;
-    padding: 10px 18px;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-
     </style>
-</head>
-<body>
-    <h2>Aula Virtual</h2>
 
-    <div class="formulario">
-        <h3>Subir nueva tarea/material</h3>
-        <form method="post" enctype="multipart/form-data">
+<body>
+    <header>
+        <div class="header-container">
+            <img src="../img/logotec.png" alt="Instituto Tecnológico Superior de San Pedro">
+            <h1>Docentes</h1>
+            <nav>
+                <ul>
+                    <li><a href="docentes.php">Inicio</a></li>
+                    <li><a href="gestion_academica.php">Gestión Académica</a></li>
+                    <li><a href="gestion_calificaciones.php">Gestión de Calificaciones</a></li>
+                    <li><a href="asistencias.php">Control de Asistencias</a></li>
+                    <li><a href="#">Aula Virtual</a></li>
+                    <li><a href="seg_academico.php">Seguimiento Académico</a></li>
+                    <li><a href="../logout.php">Salir</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="table-container">
+            <h1>Aula Virtual</h1>
+            <h3>Subir nueva tarea/material</h3>
+            <form method="post" enctype="multipart/form-data" class="form-container form-group">
             <label>Título:</label><br>
             <input type="text" name="titulo" required><br><br>
 
@@ -180,30 +155,44 @@ li a {
             <input type="text" name="tipo" required><br><br>
 
             <label>Archivo:</label><br>
-            <input type="file" name="archivo" required><br><br>
+            <div>
+                <input class="inputfile" type="file" id="file" name="archivo" accept="application/pdf" required >
+                <label for="file" class="flag"><span id="file-name">Selecciona un archivo</span></label>
+            </div><br><br>
 
             <label>Fecha límite:</label><br>
             <input type="datetime-local" name="fecha_limite" required><br><br>
-
-            <button type="submit" name="subir">Subir</button>
-        </form>
-    </div>
-
-    <h3>Materiales y tareas actuales</h3>
-    <?php if(count($materiales) > 0): ?>
-        <?php foreach($materiales as $m): ?>
-            <div class="tarea">
-                <strong>Título:</strong> <?= htmlspecialchars($m['titulo']) ?><br>
-                <strong>Tipo:</strong> <?= htmlspecialchars($m['tipo']) ?><br>
-                <strong>Archivo:</strong> <a href="<?= htmlspecialchars($m['ruta_archivo']) ?>" target="_blank">Ver</a><br>
-                <strong>Fecha límite:</strong> <?= htmlspecialchars($m['fecha_limite']) ?>
+            <div class="form-actions">
+                <button class="btn-dashboard btn-aceptar" type="submit" name="subir">Subir</button>
             </div>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <p>No hay tareas subidas</p>
-    <?php endif; ?>
+        </form>
+        </div>
+        <br><br>
+        <div class="table-container">
+            <h3>Materiales y tareas actuales</h3>
+            <?php if(count($materiales) > 0): ?>
+                <?php foreach($materiales as $m): ?>
+                    <div class="tarea">
+                        <strong>Título:</strong> <?= htmlspecialchars($m['titulo']) ?><br>
+                        <strong>Tipo:</strong> <?= htmlspecialchars($m['tipo']) ?><br>
+                        <strong>Archivo:</strong> <a href="<?= htmlspecialchars($m['ruta_archivo']) ?>" target="_blank">Ver</a><br>
+                        <strong>Fecha límite:</strong> <?= htmlspecialchars($m['fecha_limite']) ?>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>No hay tareas subidas</p>
+            <?php endif; ?>
+            <div style="text-align: center;">
+                <a class="btn-dashboard btn-historial" href="docentes.php">Volver</a>
+            </div>
+        </div>
+    </main>
+    <script>
+        document.getElementById('file').addEventListener('change', function(e) {
+            var fileName = e.target.files[0].name;
+            document.getElementById('file-name').innerHTML = fileName;
+            this.nextElementSibling.style.backgroundColor = "#2d3748"; 
+        });
+    </script> 
 </body>
-
-<li><a href="docentes.php">Volver</a></li>
-
 </html>
