@@ -36,16 +36,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unidad1'])) {
         }
         $promedio = $count > 0 ? round($suma / $count, 2) : null;
 
-        $sql_upd = "UPDATE calificaciones_activas 
-                    SET unidad_1=?, unidad_2=?, unidad_3=?, unidad_4=?, unidad_5=?, unidad_6=?, promedio_final=? 
-                    WHERE id_alumno=? AND (acta_cerrada IS NULL OR acta_cerrada != 'si')";
-        $stmt2 = $pdo->prepare($sql_upd);
-        $stmt2->execute([$u1, $u2, $u3, $u4, $u5, $u6, $promedio, $id_alumno]);
-
-        if ($stmt2->rowCount() == 0) {
-            $sql_ins = "INSERT IGNORE INTO calificaciones_activas (id_alumno, unidad_1, unidad_2, unidad_3, unidad_4, unidad_5, unidad_6, promedio_final) VALUES (?,?,?,?,?,?,?,?)";
-            $stmt_ins = $pdo->prepare($sql_ins);
-            $stmt_ins->execute([$id_alumno, $u1, $u2, $u3, $u4, $u5, $u6, $promedio]);
+        $check = $pdo->prepare("SELECT id_alumno FROM calificaciones_activas WHERE id_alumno = ?");
+        $check->execute([$id_alumno]);
+        
+        if ($check->fetch()) {
+            // Si existe, ACTUALIZAMOS (solo si el acta no está cerrada)
+            $sql_upd = "UPDATE calificaciones_activas 
+                        SET unidad_1=?, unidad_2=?, unidad_3=?, unidad_4=?, unidad_5=?, unidad_6=?, promedio_final=? 
+                        WHERE id_alumno=? AND (acta_cerrada IS NULL OR acta_cerrada != 'si')";
+            $stmt = $pdo->prepare($sql_upd);
+            $stmt->execute([$u1, $u2, $u3, $u4, $u5, $u6, $promedio, $id_alumno]);
+        } else {
+            // Si no existe, INSERTAMOS
+            $sql_ins = "INSERT INTO calificaciones_activas (id_alumno, unidad_1, unidad_2, unidad_3, unidad_4, unidad_5, unidad_6, promedio_final) 
+                        VALUES (?,?,?,?,?,?,?,?)";
+            $stmt = $pdo->prepare($sql_ins);
+            $stmt->execute([$id_alumno, $u1, $u2, $u3, $u4, $u5, $u6, $promedio]);
         }
     }
     header("Location: gestion_calificaciones.php?materia=$materia_id&msg=ok");
