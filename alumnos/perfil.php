@@ -26,14 +26,26 @@ try{
     g.nombre_grupo
     FROM
     alumnos a
-    inner join
+    left join
     grupos g on a.id_grupo = g.id_grupo
-    inner join
+    left join
     usuarios u on a.id_usuario = u.id_usuario
     where a.id_usuario= ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id_logueado]);
     $perfil = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$perfil) {
+        $perfil = [
+            'matricula' => 'No disponible',
+            'carrera' => 'No disponible',
+            'semestre_actual' => 'N/A',
+            'telefono' => 'N/A',
+            'correo' => 'N/A',
+            'estatus' => 'Sin registro',
+            'creditos' => '0',
+            'nombre_grupo' => 'Sin grupo'
+        ];
+    }
 }
 catch(PDOException $e){
     $error_message = "Error al cargar la información personal: " . $e->getMessage();

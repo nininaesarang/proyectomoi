@@ -43,12 +43,24 @@ try {
     $sql_perfil =
     "SELECT a.*, g.nombre_grupo, u.correo 
     FROM alumnos a 
-    INNER JOIN usuarios u ON a.id_usuario = u.id_usuario 
-    INNER JOIN grupos g ON a.id_grupo = g.id_grupo 
+    left JOIN usuarios u ON a.id_usuario = u.id_usuario 
+    left JOIN grupos g ON a.id_grupo = g.id_grupo 
     WHERE a.id_usuario = ?";
     $stmt_p = $pdo->prepare($sql_perfil);
     $stmt_p->execute([$id_logueado]);
     $perfil = $stmt_p->fetch(PDO::FETCH_ASSOC);
+    if (!$perfil) {
+        $perfil = [
+            'matricula' => 'No disponible',
+            'carrera' => 'No disponible',
+            'semestre_actual' => 'N/A',
+            'telefono' => 'N/A',
+            'correo' => 'N/A',
+            'estatus' => 'Sin registro',
+            'creditos' => '0',
+            'nombre_grupo' => 'Sin grupo'
+        ];
+    }
 } catch(PDOException $e) {
     $error_message = "Error al cargar perfil: " . $e->getMessage();
 }

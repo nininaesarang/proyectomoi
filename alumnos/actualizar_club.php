@@ -54,6 +54,19 @@ try {
     $stmt_c = $pdo->prepare($sql_club);
     $stmt_c->execute([$id_logueado]);
     $club = $stmt_c->fetch(PDO::FETCH_ASSOC);
+    if (!$club) {
+        $club = [
+            'matricula' => 'No disponible',
+            'carrera' => 'No disponible',
+            'semestre_actual' => 'N/A',
+            'telefono' => 'N/A',
+            'correo' => 'N/A',
+            'estatus' => 'Sin registro',
+            'nombre_actividad' => 'Sin registro',
+            'creditos' => '0',
+            'nombre_grupo' => 'Sin grupo'
+        ];
+    }
 } catch(PDOException $e) {
     $error_message = "Error al cargar perfil: " . $e->getMessage();
 }
