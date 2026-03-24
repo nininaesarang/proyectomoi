@@ -47,8 +47,8 @@ try {
     $sql_club =
     "SELECT a.*, g.nombre_grupo, u.correo, ac.nombre_actividad
     FROM alumnos a 
-    INNER JOIN usuarios u ON a.id_usuario = u.id_usuario 
-    INNER JOIN grupos g ON a.id_grupo = g.id_grupo
+    LEFT JOIN usuarios u ON a.id_usuario = u.id_usuario 
+    LEFT JOIN grupos g ON a.id_grupo = g.id_grupo
     left join actividades_complementarias ac on a.id_alumno = ac.id_alumno
     WHERE a.id_usuario = ?";
     $stmt_c = $pdo->prepare($sql_club);
