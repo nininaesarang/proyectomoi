@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $fecha_limite = $_POST['fecha_limite'];
 
         try {
-            $sql = "INSERT INTO pagos (id_alumno, concepto, monto, fecha_limite, estatus) VALUES (?, ?, ?, ?, 'Pendiente')";
+            $sql = "INSERT INTO finanzas_adeudos (id_alumno, concepto_pago, monto, fecha_vencimiento, pagado, referencia_bancaria) VALUES (?, ?, ?, ?, 'Pendiente')";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$id_alumno, $concepto, $monto, $fecha_limite]);
             $mensaje = "<div class='message-box success'>¡Cobro de $concepto asignado correctamente al alumno!</div>";
@@ -32,8 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['accion']) && $_POST['accion'] == 'pagar') {
         $id_pago = $_POST['id_pago'];
         try {
-            
-            $sql = "UPDATE pagos SET estatus = 'Pagado', fecha_pago = NOW() WHERE id_pago = ?";
+            // Actualizamos el estatus y guardamos la fecha y hora exacta del pago
+            $sql = "UPDATE finanzas_adeudos SET pagado = 'Pagado', fecha_pago = NOW() WHERE id_adeudo = ?";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$id_pago]);
             $mensaje = "<div class='message-box success'>¡El pago se ha registrado exitosamente!</div>";
@@ -50,9 +50,9 @@ $alumnos = $pdo->query("SELECT id_alumno, matricula, nombre_completo FROM alumno
 
 
 $sql_pagos = "SELECT p.*, a.matricula, a.nombre_completo 
-              FROM pagos p 
+              FROM finanzas_adeudos p 
               INNER JOIN alumnos a ON p.id_alumno = a.id_alumno 
-              ORDER BY p.estatus DESC, p.fecha_limite ASC";
+              ORDER BY p.pagado DESC, p.fecha_vencimiento ASC";
 $lista_pagos = $pdo->query($sql_pagos)->fetchAll();
 ?>
 
@@ -82,6 +82,7 @@ $lista_pagos = $pdo->query($sql_pagos)->fetchAll();
                     <li><a href="admin.php">Admisión</a></li>
                     <li><a href="alumnos/lista_alumnos.php">Alumnos</a></li>
                     <li><a href="docentes/docentes.php">Docentes</a></li>
+                    <li><a href="../administracion/horarios.php">Horarios</a></li>
                     <li><a href="academica/academica.php">Académica</a></li>
                     <li><a href="pagos.php" class="active">Pagos</a></li>
                     <li><a href="reportes.php">Reportes</a></li>
@@ -129,11 +130,16 @@ $lista_pagos = $pdo->query($sql_pagos)->fetchAll();
                         <label>3. Monto a Cobrar ($)</label>
                         <input type="number" name="monto" step="0.01" min="1" placeholder="Ej. 1500.00" required>
                     </div>
+                    <div class="form-group">
+                        <label>4. Referencia bancaria</label>
+                        <input type="text" name="referencia_bancaria">
+                    </div>
 
                     <div class="form-group">
-                        <label>4. Fecha Límite de Pago</label>
+                        <label>5. Fecha Límite de Pago</label>
                         <input type="date" name="fecha_limite" required>
                     </div>
+                    
                 </div>
                 
                 <div class="form-actions" style="text-align: right;">
@@ -162,11 +168,11 @@ $lista_pagos = $pdo->query($sql_pagos)->fetchAll();
                             <tr>
                                 <td><strong><?php echo htmlspecialchars($p['matricula']); ?></strong></td>
                                 <td><?php echo htmlspecialchars($p['nombre_completo']); ?></td>
-                                <td><?php echo htmlspecialchars($p['concepto']); ?></td>
+                                <td><?php echo htmlspecialchars($p['concepto_pago']); ?></td>
                                 <td>$<?php echo number_format($p['monto'], 2); ?></td>
-                                <td><?php echo date('d/m/Y', strtotime($p['fecha_limite'])); ?></td>
+                                <td><?php echo date('d/m/Y', strtotime($p['fecha_vencimiento'])); ?></td>
                                 <td>
-                                    <?php if($p['estatus'] == 'Pagado'): ?>
+                                    <?php if($p['pagado'] == 'Pagado'): ?>
                                         <span class="badge bg-green">Pagado</span><br>
                                         <small style="color:gray; font-size:10px;"><?php echo date('d/m/Y', strtotime($p['fecha_pago'])); ?></small>
                                     <?php else: ?>
@@ -174,7 +180,7 @@ $lista_pagos = $pdo->query($sql_pagos)->fetchAll();
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <?php if($p['estatus'] == 'Pendiente'): ?>
+                                    <?php if($p['pagado'] == 'Pendiente'): ?>
                                         <form action="pagos.php" method="POST" style="margin:0;">
                                             <input type="hidden" name="accion" value="pagar">
                                             <input type="hidden" name="id_pago" value="<?php echo $p['id_pago']; ?>">

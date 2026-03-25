@@ -1,0 +1,110 @@
+<?php
+session_start();
+require '../conexion.php';
+require 'header_alumno.php'; 
+
+if(!isset($_SESSION['id_usuario']) || $_SESSION['rol'] != 'alumno'){
+    die("Error: Debes iniciar sesión como alumno");
+}
+
+$id_usuario = $_SESSION['id_usuario'];
+
+try {
+    $stmtAl = $pdo->prepare("SELECT id_alumno FROM alumnos WHERE id_usuario = ? LIMIT 1");
+    $stmtAl->execute([$id_usuario]);
+    $alumno = $stmtAl->fetch(PDO::FETCH_ASSOC);
+
+    if(!$alumno){
+        die("Error: Registro de alumno no encontrado.");
+    }
+
+    $id_alumno = $alumno['id_alumno'];
+    $stmt = $pdo->prepare("
+        SELECT m.asunto, m.mensaje, m.fecha_envio, d.nombre_completo
+        FROM mensajes m
+        INNER JOIN docentes d ON m.id_docente = d.id_docente
+        WHERE m.id_alumno = ?
+        ORDER BY m.fecha_envio DESC
+    ");
+    $stmt->execute([$id_alumno]);
+    $mensajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch(PDOException $e) {
+    die("Error técnico: " . $e->getMessage());
+}
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Comentarios del Docente</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        h1 { text-align: center; margin-top: 20px; }
+        img {width: 100px;}
+        a {text-align: center;}
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #c4c2c2;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <img src="../img/logotec.png" alt="Instituto Tecnológico Superior de San Pedro">
+            <h1>Alumnos</h1>
+            <nav>
+                <ul>
+                    <li><a href="#">Aula Virtual</a></li>
+                    <li><a href="perfil.php">Perfil</a></li>
+                    <li><a href="horarios.php">Horario</a></li>
+                    <li><a href="calificaciones.php">Calificaciones</a></li>
+                    <li><a href="finanzas.php">Estado Financiero</a></li>
+                    <li><a href="club.php">Club Escolar</a></li>
+                    <?php if (isset($_SESSION['id_usuario']) && $_SESSION['rol'] == 'alumno' && $tiene_registro_ss): ?>
+                    <li><a href="servicio.php">Servicio Social</a></li>
+                    <?php endif; ?>
+                    <li><a href="../logout.php">Salir</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="table-container">
+            <h1>Comentarios del Docente</h1>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Docente</th>
+                        <th>Asunto</th>
+                        <th>Mensaje</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if(!empty($mensajes)): ?>
+                        <?php foreach($mensajes as $m): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($m['nombre_completo']) ?></td>
+                                <td><?= htmlspecialchars($m['asunto']) ?></td>
+                                <td><?= nl2br(htmlspecialchars($m['mensaje'])) ?></td>
+                                <td><?= htmlspecialchars($m['fecha_envio']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="4" style="text-align: center;">No tienes comentarios registrados actualmente.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+            <br>
+            <a class="btn-dashboard btn-historial" href="alumnos.php">Volver al Aula Virtual</a>
+        </div>
+    </main>
+</body>
+</html>

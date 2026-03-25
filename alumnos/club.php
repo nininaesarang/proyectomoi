@@ -16,15 +16,25 @@ try{
     $sql = "SELECT a.*, g.nombre_grupo, u.correo, ac.nombre_actividad
     FROM
     alumnos a
-    inner join usuarios u on a.id_usuario = u.id_usuario
-    inner join grupos g on a.id_grupo = g.id_grupo
+    left join usuarios u on a.id_usuario = u.id_usuario
+    left join grupos g on a.id_grupo = g.id_grupo
     left join actividades_complementarias ac on a.id_alumno = ac.id_alumno
     where a.id_usuario = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id_logueado]);
     $club = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$club) {
-        $club = [];
+        $club = [
+            'matricula' => 'No disponible',
+            'carrera' => 'No disponible',
+            'semestre_actual' => 'N/A',
+            'telefono' => 'N/A',
+            'correo' => 'N/A',
+            'estatus' => 'Sin registro',
+            'nombre_actividad' => 'Sin registro',
+            'creditos' => '0',
+            'nombre_grupo' => 'Sin grupo'
+        ];
     }
 }
 catch(PDOException $e){

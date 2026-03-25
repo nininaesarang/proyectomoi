@@ -6,7 +6,7 @@
     <title>Docentes</title>
     <link rel="stylesheet" href="../style.css">
 <style>
-h3 {text-align: center;}
+h3{text-align: center;}
 img {width: 100px;}
 a {text-align: center;}
 body {
@@ -15,6 +15,7 @@ body {
     padding: 0;
     background-color: #c4c2c2;
 }
+main{text-align: center;}
 </style>
 </head>
     <header>
@@ -24,11 +25,11 @@ body {
             <nav>
                 <ul>
                     <li><a href="#" class="active">Inicio</a></li>
-                    <li><a href="#">Actividad 1</a></li>
-                    <li><a href="#">Actividad 2</a></li>
-                    <li><a href="#">Actividad 3</a></li>
-                    <li><a href="#">Actividad 4</a></li>
-                    <li><a href="#">Actividad 5</a></li>
+                    <li><a href="gestion_academica.php">Gestión Académica</a></li>
+                    <li><a href="gestion_calificaciones.php">Gestión de Calificaciones</a></li>
+                    <li><a href="asistencias.php">Control de Asistencias</a></li>
+                    <li><a href="aula_virtual.php">Aula Virtual</a></li>
+                    <li><a href="seg_academico.php">Seguimiento Académico</a></li>
                     <li><a href="../logout.php">Salir</a></li>
                 </ul>
             </nav>
@@ -37,9 +38,10 @@ body {
 
     <main class="main-content">
         <div class="table-container">
-            <h1 style="text-align: center;">Plantilla</h1>
-            <h2 style="text-align: center;">Insertar texto</h2>
-            <h3 style="text-align: center;">Insertar descripción <a class="btn-dashboard btn-opcion" href="#">Botón 1</a></h3>
+            <h1 style="text-align: center;">Docentes - Inicio</h1>
+            <h2>Bienvenido al Sistema</h2>
+            <h3>Tu retroalimentación es la brújula que guía su futuro.</h3>
+            <br><img style="height:100%; width:50%;" src="../img/bibliotecas.jpg">
         </div>
     </main>
 </body>

@@ -153,6 +153,8 @@ strong{color: #d53333}
     margin-top: 0;
     margin-bottom: 30px;
     color: #333;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .form-group {
@@ -266,6 +268,7 @@ strong{color: #d53333}
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     padding: 30px 40px;
+    overflow-x: auto;
 }
 
 .table-container h2 {
@@ -348,6 +351,7 @@ strong{color: #d53333}
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    min-width: 800px;
 }
 
 .history-table th,
@@ -545,4 +549,20 @@ strong{color: #d53333}
 .main-view { display: none; }
 #section-calif {
     display: block;
+}
+
+/* Alumnos en riesgo */
+.lista-riesgo {
+    width: 80%;
+    margin: 20px auto;
+    padding: 0;
+    list-style: none;
+}
+
+.lista-riesgo li {
+    background-color: #ffe0b3;
+    margin: 5px 0;
+    padding: 8px 12px;
+    border-radius: 5px;
+    color: #856404;
 }

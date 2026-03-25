@@ -31,7 +31,7 @@ catch(PDOException $e){
 ?>
 
 <!DOCTYPE html>
-<body><html lang="es">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -49,6 +49,7 @@ body {
 }
 </style>
 </head>
+<body>
     <header>
         <div class="header-container">
             <img src="../img/logotec.png" alt="Instituto Tecnológico Superior de San Pedro">
@@ -94,8 +95,8 @@ body {
                             <tr>
                                 <td><?php echo htmlspecialchars($row['titulo']); ?></td>
                                 <td><?php echo htmlspecialchars($row['tipo']); ?></td>
-                                <td><?php echo htmlspecialchars($row['ruta_archivo']); ?></td>
-                                <td><?php echo date('dd/mm/yyyy', strtotime($row['fecha_limite'])); ?></td>
+                                <td><a href="../docentes/<?= htmlspecialchars($row['ruta_archivo']) ?>" target="_blank" class="link-tarea">Ver archivo</a></td>
+                                <td><?php echo date('d/m/y - H:i A', strtotime($row['fecha_limite'])); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -108,7 +109,9 @@ body {
             <br>
             <h3>Acceso al aula virtual: <a class="btn-dashboard btn-opcion" href="https://classroom.google.com/">Acceder</a></h3>
             <br>
-            <label class="form-container form-group" style="display: block; text-align: center;"><strong>Nota: El profesor lo añadirá a su clase.</strong></label>
+            <h3>Comentarios del profesor: <a class="btn-dashboard btn-primary" href="comentarios.php">Acceder</a></h3>
+            <br>
+            <label class="form-container form-group" style="display: block; text-align: center;"><strong>Nota: El profesor lo añadirá a su clase en el enlace externo.</strong></label>
         </div>
         
     </main>

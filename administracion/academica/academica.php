@@ -29,6 +29,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
                     <li><a href="../admin.php">Admisión</a></li>
                     <li><a href="../alumnos/lista_alumnos.php">Alumnos</a></li>
                     <li><a href="../docentes/docentes.php">Docentes</a></li>
+                    <li><a href="../horarios.php">Horarios</a></li>
                     <li><a href="academica.php" class="active">Académica</a></li>
                     <li><a href="../pagos.php">Pagos</a></li>
                     <li><a href="../reportes.php">Reportes</a></li>
