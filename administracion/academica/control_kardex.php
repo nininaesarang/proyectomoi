@@ -44,7 +44,7 @@ try {
 
     <main class="main-content">
         <div class="table-container" style="max-width: 900px;">
-            <h2>Control de Retículas y Kárdex</h2>
+            <h2>Control del Kárdex</h2>
             <p style="text-align:center; margin-bottom:20px;">Selecciona un alumno para revisar su historial de calificaciones y materias cursadas.</p>
 
             <table class="history-table">

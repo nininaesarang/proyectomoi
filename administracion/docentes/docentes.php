@@ -135,7 +135,7 @@ try {
         </div>
 
         <div class="table-container">
-            <h2>Plantilla Docente</h2>
+            <h2>Asignación Docentes</h2>
 
             <div style="text-align: right; margin-bottom: 15px;">
                 <a href="carga_academica.php" class="btn-primary" style="text-decoration:none;">+ Asignar Materias</a>

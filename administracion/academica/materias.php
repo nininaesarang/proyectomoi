@@ -95,7 +95,7 @@ try {
         </div>
 
         <div class="table-container">
-            <h2>Catálogo de Materias de la Retícula</h2>
+            <h2>Materias Registradas</h2>
             <table class="history-table">
                 <thead>
                     <tr>

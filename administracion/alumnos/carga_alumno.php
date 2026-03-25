@@ -100,7 +100,7 @@ $inscritas_array = $stmt_inscritas->fetchAll(PDO::FETCH_COLUMN);
 
     <main class="main-content">
         <div class="form-container" style="max-width: 900px;">
-            <h2>Asignar Materias (Carga Académica)</h2>
+            <h2>Asignar Materias</h2>
             
             <div class="info-box">
                 <strong>Matrícula:</strong> <?php echo htmlspecialchars($alumno['matricula']); ?> | 
