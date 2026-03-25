@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Seguridad
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
     header("Location: ../../index.php");
     exit;
@@ -10,14 +10,13 @@ include '../../conexion.php';
 
 $mensaje = '';
 
-// Si se envió el formulario para guardar una nueva materia
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre_materia = trim($_POST['nombre_materia'] ?? '');
     $creditos = $_POST['creditos'] ?? '';
 
     if (!empty($nombre_materia) && !empty($creditos)) {
         try {
-            // Guardamos la materia en el catálogo
             $sql_insert = "INSERT INTO materias (nombre_materia, creditos) VALUES (?, ?)";
             $stmt_insert = $pdo->prepare($sql_insert);
             $stmt_insert->execute([$nombre_materia, $creditos]);
@@ -31,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Consultamos las materias registradas para mostrarlas en la tabla
+
 try {
     $sql_materias = "SELECT * FROM materias ORDER BY id_materia DESC";
     $stmt_materias = $pdo->query($sql_materias);
@@ -96,7 +95,7 @@ try {
         </div>
 
         <div class="table-container">
-            <h2>Catálogo de Materias de la Retícula</h2>
+            <h2>Materias Registradas</h2>
             <table class="history-table">
                 <thead>
                     <tr>

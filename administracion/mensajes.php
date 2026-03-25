@@ -9,11 +9,11 @@ include '../conexion.php';
 $id_admin = $_SESSION['id_usuario'];
 $mensaje_alerta = '';
 
-// Si el admin presiona el botón de "Marcar Atendido"
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['atender_mensaje'])) {
     $id_mensaje = $_POST['id_mensaje'];
     try {
-        // Cambiamos el estatus a leido = 1 para que desaparezca
+       
         $sql_update = "UPDATE mensajes_admin SET leido = 1 WHERE id_mensaje = ?";
         $stmt_update = $pdo->prepare($sql_update);
         $stmt_update->execute([$id_mensaje]);
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['atender_mensaje'])) {
     }
 }
 
-// Obtener solo los mensajes que NO han sido leídos (leido = 0)
+
 $stmt = $pdo->prepare("
     SELECT ma.id_mensaje, ma.asunto, ma.mensaje, ma.fecha_envio, d.nombre_completo
     FROM mensajes_admin ma

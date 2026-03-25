@@ -8,7 +8,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
 include '../../conexion.php';
 
 try {
-    // Usamos LEFT JOIN para traer el nombre del grupo si es que ya tiene uno asignado
+
     $sql = "SELECT a.id_alumno, a.matricula, a.nombre_completo, a.carrera, a.semestre_actual, a.estatus, g.nombre_grupo 
             FROM alumnos a 
             LEFT JOIN grupos g ON a.id_grupo = g.id_grupo
@@ -98,9 +98,9 @@ try {
 
                                 <td style="white-space: nowrap; text-align: center;">
                                     <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
-                                        <a href="asignar_alumno.php?id=<?php echo $alum['id_alumno']; ?>" class="btn-details" style="text-decoration:none; display:inline-block; padding:8px 15px; width: 140px; box-sizing: border-box;">Editar / Grupo</a>
+                                        <a href="asignar_alumno.php?id=<?php echo $alum['id_alumno']; ?>" class="btn-details" style="text-decoration:none; display:inline-block; padding:8px 15px; width: 140px; box-sizing: border-box; border-radius: 4px;">Editar / Grupo</a>
                                         
-                                        <a href="carga_alumno.php?id=<?php echo $alum['id_alumno']; ?>" class="btn-primary" style="text-decoration:none; display:inline-block; padding:8px 15px; width: 140px; box-sizing: border-box; background-color: #007bff;">Materias</a>
+                                        <a href="carga_alumno.php?id=<?php echo $alum['id_alumno']; ?>" class="btn-primary" style="text-decoration:none; display:inline-block; padding:7px 14px; width: 140px; box-sizing: border-box; border-radius: 4px;">Materias</a>
                                     </div>
                                 </td>
                             </tr>

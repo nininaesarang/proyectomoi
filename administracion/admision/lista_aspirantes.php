@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Seguridad para que solo entre el administrador
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
     header("Location: ../index.php");
     exit;
@@ -8,7 +8,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
 
 include '../../conexion.php';
 
-// Consultamos a todos los aspirantes registrados en la base de datos
+
 try {
     $sql = "SELECT * FROM aspirantes ORDER BY id_aspirante DESC";
     $stmt = $pdo->query($sql);
