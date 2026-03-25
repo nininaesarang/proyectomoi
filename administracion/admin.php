@@ -55,17 +55,10 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
             </div>
 
             <div class="dashboard-item">
-                <h3>Control de Documentos</h3>
-                <p>Valida la entrega de papelería física (Acta, CURP, Certificado) de los aspirantes registrados.</p>
+                <h3>Seguimiento de Aspirantes</h3>
+                <p>Valida la entrega de documentos físicos, captura resultados del examen y cobra inscripciones.</p>
                 <br>
-                <a class="btn-dashboard btn-aceptar" href="admision/lista_aspirantes.php">Revisar Papeles</a>
-            </div>
-            
-            <div class="dashboard-item">
-                <h3>Resultados y Cobros</h3>
-                <p>Captura los resultados del examen de admisión y registra los pagos formales de inscripción.</p>
-                <br>
-                <a class="btn-dashboard btn-historial" href="admision/lista_aspirantes.php">Registrar Resultados</a>
+                <a class="btn-dashboard btn-aceptar" href="admision/lista_aspirantes.php">Gestionar Aspirantes</a>
             </div>
         </div>
     </main>

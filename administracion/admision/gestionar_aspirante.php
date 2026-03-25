@@ -133,8 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <div class="form-group">
                         <label>¿Pagó la Ficha?</label>
                         <select name="pago_ficha" style="width: 100%; padding: 10px; border-radius: 4px;">
-                            <option value="0" <?php echo $aspirante['pago_ficha_realizada'] == '0' ? 'selected' : ''; ?>>No (Pendiente)</option>
-                            <option value="1" <?php echo $aspirante['pago_ficha_realizada'] == '1' ? 'selected' : ''; ?>>Sí (Pagado)</option>
+                            <option value="0" <?php echo $aspirante['pago_ficha_realizada'] == '0' ? 'selected' : ''; ?>>No </option>
+                            <option value="1" <?php echo $aspirante['pago_ficha_realizada'] == '1' ? 'selected' : ''; ?>>Sí </option>
                         </select>
                     </div>
 

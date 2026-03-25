@@ -97,9 +97,9 @@ try {
 
                                 <td style="white-space: nowrap; text-align: center;">
                                     <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
-                                        <a href="asignar_alumno.php?id=<?php echo $alum['id_alumno']; ?>" class="btn-details" style="text-decoration:none; display:inline-block; padding:8px 15px; width: 140px; box-sizing: border-box;">Editar / Grupo</a>
+                                        <a href="asignar_alumno.php?id=<?php echo $alum['id_alumno']; ?>" class="btn-details" style="text-decoration:none; display:inline-block; padding:8px 15px; width: 140px; box-sizing: border-box; border-radius: 4px;">Editar / Grupo</a>
                                         
-                                        <a href="carga_alumno.php?id=<?php echo $alum['id_alumno']; ?>" class="btn-primary" style="text-decoration:none; display:inline-block; padding:8px 15px; width: 140px; box-sizing: border-box; background-color: #007bff;">Materias</a>
+                                        <a href="carga_alumno.php?id=<?php echo $alum['id_alumno']; ?>" class="btn-primary" style="text-decoration:none; display:inline-block; padding:7px 14px; width: 140px; box-sizing: border-box; border-radius: 4px;">Materias</a>
                                     </div>
                                 </td>
                             </tr>

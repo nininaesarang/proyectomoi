@@ -115,7 +115,7 @@ try {
                     </div>
                     
                     <div class="form-group" style="flex: 2;">
-                        <label for="correo">Correo Institucional (Para iniciar sesión)</label>
+                        <label for="correo">Correo Institucional</label>
                         <input type="email" id="correo" name="correo" placeholder="ejemplo@tecsanpedro.edu.mx" required>
                     </div>
                 </div>
@@ -123,7 +123,7 @@ try {
                 <div class="form-group">
                     <label for="estatus">Estatus en el Plantel</label>
                     <select name="estatus" id="estatus" style="width: 100%; padding: 10px; border-radius: 4px;">
-                        <option value="Activo">Activo (Dando clases)</option>
+                        <option value="Activo">Activo</option>
                         <option value="Inactivo">Inactivo / Baja</option>
                     </select>
                 </div>

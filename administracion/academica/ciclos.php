@@ -84,8 +84,8 @@ try {
                     <div class="form-group">
                         <label for="activo">¿Está Activo?</label>
                         <select name="activo" id="activo" style="width: 100%; padding: 10px; border-radius: 4px;">
-                            <option value="Sí">Sí (Periodo actual)</option>
-                            <option value="No">No (Periodo cerrado)</option>
+                            <option value="Sí">Sí</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
                 </div>
