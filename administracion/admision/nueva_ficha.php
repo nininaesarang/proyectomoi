@@ -1,38 +1,37 @@
 <?php
 session_start();
-// Seguridad: Validar que solo el administrador entre aquí
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
     header("Location: ../index.php");
     exit;
 }
 
-// Incluimos la conexión a la base de datos
+
 include '../../conexion.php';
 
 $mensaje = '';
 
-// Si el formulario fue enviado por el botón de "Guardar"
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre = $_POST['nombre_completo'] ?? '';
 
     if (!empty($nombre)) {
-        // Generamos una referencia bancaria aleatoria (Ej. FCH-2026-4829)
+
         $referencia = "FCH-" . date("Y") . "-" . rand(1000, 9999);
 
         try {
-            // Insertamos al aspirante en la base de datos de forma segura
+
             $sql = "INSERT INTO aspirantes (nombre_completo, ficha_referencia, pago_ficha_realizada, docs_entregados, pago_inscripcion_realizado, aceptado) 
                     VALUES (?, ?, 0, 0, 0, 0)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$nombre, $referencia]);
 
-            // Mensaje de éxito usando tus estilos CSS
+
             $mensaje = "<div class='message-box success'>
                             ¡Aspirante registrado correctamente! <br>
                             Su referencia de pago es: <strong>$referencia</strong>
                         </div>";
         } catch (PDOException $e) {
-            // Si algo falla en la base de datos, mostramos el error
             $mensaje = "<div class='message-box error'>Error al registrar: " . $e->getMessage() . "</div>";
         }
     } else {

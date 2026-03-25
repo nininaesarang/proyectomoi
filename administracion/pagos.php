@@ -9,9 +9,9 @@ include '../conexion.php';
 
 $mensaje = '';
 
-// Procesar formularios (Crear cobro o Marcar como pagado)
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // 1. Asignar un nuevo cobro a un alumno
+ 
     if (isset($_POST['accion']) && $_POST['accion'] == 'nuevo_cobro') {
         $id_alumno = $_POST['id_alumno'];
         $concepto = $_POST['concepto'];
@@ -28,11 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     
-    // 2. Marcar un cobro pendiente como PAGADO
+    
     if (isset($_POST['accion']) && $_POST['accion'] == 'pagar') {
         $id_pago = $_POST['id_pago'];
         try {
-            // Actualizamos el estatus y guardamos la fecha y hora exacta del pago
+            
             $sql = "UPDATE pagos SET estatus = 'Pagado', fecha_pago = NOW() WHERE id_pago = ?";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$id_pago]);
@@ -43,12 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// CONSULTAS PARA LA INTERFAZ
 
-// 1. Obtener lista de alumnos activos para el formulario
+
+
 $alumnos = $pdo->query("SELECT id_alumno, matricula, nombre_completo FROM alumnos WHERE estatus = 'Activo' ORDER BY nombre_completo")->fetchAll();
 
-// 2. Obtener el historial completo de pagos (Pendientes y Pagados)
+
 $sql_pagos = "SELECT p.*, a.matricula, a.nombre_completo 
               FROM pagos p 
               INNER JOIN alumnos a ON p.id_alumno = a.id_alumno 

@@ -8,7 +8,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
 include '../../conexion.php';
 
 try {
-    // Usamos LEFT JOIN para traer el nombre del grupo si es que ya tiene uno asignado
+
     $sql = "SELECT a.id_alumno, a.matricula, a.nombre_completo, a.carrera, a.semestre_actual, a.estatus, g.nombre_grupo 
             FROM alumnos a 
             LEFT JOIN grupos g ON a.id_grupo = g.id_grupo

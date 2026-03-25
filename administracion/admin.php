@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Validación de seguridad: Si no hay sesión o no es admin, lo pateamos al login
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
     header("Location: ../index.php");
     exit;

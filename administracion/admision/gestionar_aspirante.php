@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Seguridad
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
     header("Location: ../index.php");
     exit;
@@ -16,7 +16,7 @@ if (!$id_aspirante) {
     exit;
 }
 
-// 1. Consultamos los datos actuales ANTES de actualizar
+
 $sql_actual = "SELECT * FROM aspirantes WHERE id_aspirante = ?";
 $stmt_actual = $pdo->prepare($sql_actual);
 $stmt_actual->execute([$id_aspirante]);
@@ -27,7 +27,7 @@ if (!$aspirante) {
     exit;
 }
 
-// 2. Si se presionó el botón de "Guardar Cambios"
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $pago_ficha = $_POST['pago_ficha'] ?? '0';
     $calificacion = !empty($_POST['calificacion']) ? $_POST['calificacion'] : null;
@@ -36,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $aceptado = $_POST['aceptado'] ?? '0';
 
     try {
-        // 1. ACTUALIZAR ASPIRANTE (Con 6 variables exactas)
         $sql_update = "UPDATE aspirantes SET 
                 pago_ficha_realizada = ?, 
                 calificacion_examen = ?, 
@@ -45,12 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 aceptado = ? 
                 WHERE id_aspirante = ?";
         $stmt_update = $pdo->prepare($sql_update);
-        // Aquí no va el nombre, solo los 6 datos de arriba
+
         $stmt_update->execute([$pago_ficha, $calificacion, $docs, $pago_insc, $aceptado, $id_aspirante]);
         
         $mensaje = "<div class='message-box success'>¡Datos de admisión actualizados correctamente!</div>";
 
-        // 2. LA MAGIA DE LA AUTOMATIZACIÓN (Crear Alumno)
+
         
         if ($aceptado == '1' && $aspirante['aceptado'] != '1') {
             
@@ -58,17 +57,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $correo_nuevo = "A" . $matricula_nueva . "@tecsanpedro.edu.mx";
             $password_nueva = "12345678";
 
-            // A. Insertar Usuario
+
             $sql_user = "INSERT INTO usuarios (correo, password, rol) VALUES (?, ?, 'alumno')";
             $stmt_user = $pdo->prepare($sql_user);
             $stmt_user->execute([$correo_nuevo, $password_nueva]);
             $id_usuario_nuevo = $pdo->lastInsertId();
 
-            // B. Insertar Alumno (AQUÍ SÍ VA EL NOMBRE COMPLETO)
+     
             $sql_alumno = "INSERT INTO alumnos (id_usuario, matricula, nombre_completo, carrera, semestre_actual, estatus, creditos) 
                            VALUES (?, ?, ?, 'Ingeniería en Sistemas', 1, 'Activo', 0)";
             $stmt_alumno = $pdo->prepare($sql_alumno);
-            // Aquí le pasamos exactamente 3 variables a los 3 signos de interrogación
+
             $stmt_alumno->execute([$id_usuario_nuevo, $matricula_nueva, $aspirante['nombre_completo']]);
 
             $mensaje .= "<div class='message-box' style='margin-top:10px; border:1px solid #007bff; background-color:#cce5ff; color:#004085; text-align:center;'>
@@ -80,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                          </div>";
         }
 
-        // Refrescamos los datos
+
         $stmt_actual->execute([$id_aspirante]);
         $aspirante = $stmt_actual->fetch();
 

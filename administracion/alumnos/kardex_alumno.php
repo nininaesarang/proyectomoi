@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Seguridad
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
     header("Location: ../../index.php");
     exit;
@@ -14,7 +14,7 @@ if (!$id_alumno) {
     exit;
 }
 
-// 1. Datos del alumno
+
 $stmt_alum = $pdo->prepare("SELECT matricula, nombre_completo, carrera, semestre_actual FROM alumnos WHERE id_alumno = ?");
 $stmt_alum->execute([$id_alumno]);
 $alumno = $stmt_alum->fetch();
@@ -24,7 +24,7 @@ if (!$alumno) {
     exit;
 }
 
-// 2. Historial del Kárdex para identificar materias y repeticiones
+
 $sql_kardex = "SELECT k.*, m.nombre_materia, m.creditos, c.nombre_periodo 
                FROM kardex k
                INNER JOIN materias m ON k.id_materia = m.id_materia

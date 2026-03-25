@@ -7,7 +7,6 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
 
 include '../../conexion.php';
 
-// Consultamos solo a los alumnos activos para revisar su Kárdex
 try {
     $sql = "SELECT id_alumno, matricula, nombre_completo, semestre_actual FROM alumnos ORDER BY semestre_actual ASC";
     $stmt = $pdo->query($sql);

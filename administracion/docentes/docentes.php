@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Seguridad
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
     header("Location: ../../index.php");
     exit;
@@ -10,7 +10,7 @@ include '../../conexion.php';
 
 $mensaje = '';
 
-// Si se envió el formulario para guardar un nuevo profe
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre_completo = trim($_POST['nombre_completo'] ?? '');
     $correo = trim($_POST['correo'] ?? '');
@@ -18,24 +18,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (!empty($nombre_completo) && !empty($correo)) {
         try {
-            // Empezamos una transacción para que si falla algo, no se guarde a medias
+            
             $pdo->beginTransaction();
 
-            // 1. Creamos la cuenta del maestro en la tabla usuarios
-            $password_temporal = "profe123"; // Contraseña genérica para todos los nuevos
+          
+            $password_temporal = "profe123"; 
             $sql_user = "INSERT INTO usuarios (correo, password, rol) VALUES (?, ?, 'docente')";
             $stmt_user = $pdo->prepare($sql_user);
             $stmt_user->execute([$correo, $password_temporal]);
             
-            // Sacamos el ID del usuario que se acaba de crear
+           
             $id_usuario_nuevo = $pdo->lastInsertId();
 
-            // 2. Registramos su perfil en la tabla docentes usando ese ID
+           
             $sql_docente = "INSERT INTO docentes (id_usuario, nombre_completo, estatus) VALUES (?, ?, ?)";
             $stmt_docente = $pdo->prepare($sql_docente);
             $stmt_docente->execute([$id_usuario_nuevo, $nombre_completo, $estatus]);
 
-            // Confirmamos que todo salió bien
+          
             $pdo->commit();
             
             $mensaje = "<div class='message-box success' style='text-align:center;'>
@@ -45,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             Contraseña temporal: <strong>$password_temporal</strong>
                         </div>";
         } catch (PDOException $e) {
-            // Si hay error, cancelamos todo
             $pdo->rollBack();
             $mensaje = "<div class='message-box error'>Error al registrar: " . $e->getMessage() . "</div>";
         }
@@ -54,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Consultamos a los docentes registrados para la tabla
+
 try {
     $sql_docentes = "SELECT d.id_docente, d.nombre_completo, d.estatus, u.correo 
                      FROM docentes d 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Seguridad
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
     header("Location: ../../index.php");
     exit;
@@ -10,7 +10,7 @@ include '../../conexion.php';
 
 $mensaje = '';
 
-// Si se envió el formulario para guardar un nuevo ciclo
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre_periodo = $_POST['nombre_periodo'] ?? '';
     $activo = $_POST['activo'] ?? 'Sí';
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Consultamos los ciclos registrados para mostrarlos en la tabla
+
 try {
     $sql = "SELECT * FROM ciclos_escolares ORDER BY id_ciclo DESC";
     $stmt = $pdo->query($sql);

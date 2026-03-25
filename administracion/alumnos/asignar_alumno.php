@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Seguridad
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
     header("Location: ../../index.php");
     exit;
@@ -16,9 +16,8 @@ if (!$id_alumno) {
 
 $mensaje = '';
 
-// Si se presiona el botón de guardar
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Si no selecciona grupo, mandamos null para que la BD no marque error
     $id_grupo = !empty($_POST['id_grupo']) ? $_POST['id_grupo'] : null;
     $semestre = $_POST['semestre'] ?? 1;
     $estatus = $_POST['estatus'] ?? 'Activo';
@@ -33,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Traemos la información actual del alumno
+
 $sql_alum = "SELECT * FROM alumnos WHERE id_alumno = ?";
 $stmt_alum = $pdo->prepare($sql_alum);
 $stmt_alum->execute([$id_alumno]);
@@ -44,7 +43,7 @@ if (!$alumno) {
     exit;
 }
 
-// Traemos la lista de grupos disponibles desde la BD para llenar el desplegable
+
 $sql_grupos = "SELECT * FROM grupos";
 $stmt_grupos = $pdo->query($sql_grupos);
 $grupos = $stmt_grupos->fetchAll();
