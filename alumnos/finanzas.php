@@ -32,12 +32,13 @@ try{
     $todos_pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $pagos_realizados = array_filter($todos_pagos, function($pago) {
-        return strtolower($pago['pagado']) === 'si';
-    });
+    return strtolower(trim($pago['pagado'])) === 'pagado'; 
+});
 
-    $pagos_pendientes = array_filter($todos_pagos, function($pago) {
-        return strtolower($pago['pagado']) === 'no';
-    });
+// Filtramos los pendientes (comparamos contra 'pendiente' en minúsculas)
+$pagos_pendientes = array_filter($todos_pagos, function($pago) {
+    return strtolower(trim($pago['pagado'])) === 'pendiente';
+});
 }
 catch(PDOException $e){
     $error_message = "Error al cargar las tareas: " . $e->getMessage();

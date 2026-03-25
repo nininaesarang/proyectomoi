@@ -1,5 +1,6 @@
 <?php
 session_start();
+require '../conexion.php';
 ?>
 
 <!DOCTYPE html>

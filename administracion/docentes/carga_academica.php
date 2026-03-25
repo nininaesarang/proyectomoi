@@ -108,6 +108,7 @@ try {
                     <li><a href="../admin.php">Admisión</a></li>
                     <li><a href="../alumnos/lista_alumnos.php">Alumnos</a></li>
                     <li><a href="docentes.php" class="active">Docentes</a></li>
+                    <li><a href="../horarios.php">Horarios</a></li>
                     <li><a href="../academica/academica.php">Académica</a></li>
                     <li><a href="../pagos.php">Pagos</a></li>
                     <li><a href="../reportes.php">Reportes</a></li>
