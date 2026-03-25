@@ -14,8 +14,7 @@ $id_docente = $docente['id_docente'] ?? 0;
 
 // Alumnitos
 $sql_alumnos = "SELECT alumnos.id_alumno,
-       alumnos.matricula,
-       usuarios.correo,
+       alumnos.matricula, nombre_completo,
        alumnos.semestre_actual
 FROM alumnos
 JOIN usuarios ON usuarios.id_usuario = alumnos.id_usuario
@@ -81,7 +80,7 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
     $faltas = $row['faltas'];
     $total = $row['total'];
     $porcentaje = $total > 0 ? round((($total - $faltas)/$total)*100,2) : 100;
-    $estado = $faltas >= 3 ? "En riesgo" : "Normal";
+    $estado = $porcentaje < 70 ? "En riesgo" : "Normal";
 
     //guarda aui
     $historial[$row['id_alumno']] = [
@@ -162,7 +161,7 @@ input[type="submit"] {
                     $hist = $historial[$id_al] ?? ['faltas'=>0,'retardos'=>0,'porcentaje'=>100,'estado'=>'Normal'];
                 ?>
                 <tr>
-                    <td><?= $alumno['correo'] ?></td>
+                    <td><?= $alumno['nombre_completo'] ?></td>
                     <td><?= $alumno['matricula'] ?></td>
                     <td><?= $alumno['semestre_actual'] ?></td>
                     <td>
@@ -180,8 +179,9 @@ input[type="submit"] {
                     <?php endforeach; ?>
                     </tbody>
                 </table>
+                <input class="form-group" type="submit" name="guardar_asistencia" value="Guardar Asistencias">
+
             </form>
-            <input class="form-group" type="submit" name="guardar_asistencia" value="Guardar Asistencias">
             <div style="text-align: right;">
                 <a class= "btn-dashboard btn-historial" href="docentes.php">Volver</a>
             </div>

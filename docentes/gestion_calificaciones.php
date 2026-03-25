@@ -65,6 +65,45 @@ if (isset($_GET['cerrar'])) {
     exit;
 }
 
+if (isset($_GET['solicitar'])) {
+
+    //docente q inicio sesion
+    $id_usuario = $_SESSION['id_usuario'];
+
+    $stmt_doc = $pdo->prepare("SELECT id_docente, nombre_completo FROM docentes WHERE id_usuario = ?");
+    $stmt_doc->execute([$id_usuario]);
+    $docente = $stmt_doc->fetch(PDO::FETCH_ASSOC);
+
+    if ($docente) {
+
+        //solo adminsss
+        $stmt_admins = $pdo->prepare("SELECT id_usuario FROM usuarios WHERE rol = 'administrativo'");
+        $stmt_admins->execute();
+        $admins = $stmt_admins->fetchAll(PDO::FETCH_ASSOC);
+
+        //Mensajito
+        $asunto = "Solicitud para reabrir la acta";
+        $mensaje = "El docente " . $docente['nombre_completo'] . " está solicitando abrir las actas para modificación.";
+
+        //Mandar a los admnisss omg
+        foreach ($admins as $admin) {
+            $stmt_insert = $pdo->prepare("
+                INSERT INTO mensajes_admin (id_docente, id_admin, asunto, mensaje)
+                VALUES (?, ?, ?, ?)
+            ");
+            $stmt_insert->execute([
+                $docente['id_docente'],
+                $admin['id_usuario'],
+                $asunto,
+                $mensaje
+            ]);
+        }
+    }
+
+    header("Location: gestion_calificaciones.php?materia=$materia_id&msg=solicitud_enviada");
+    exit;
+}
+
 $sql = "SELECT a.id_alumno, a.matricula, a.carrera, 
                ca.unidad_1, ca.unidad_2, ca.unidad_3, ca.unidad_4, ca.unidad_5, ca.unidad_6, 
                ca.promedio_final, ca.acta_cerrada
@@ -170,6 +209,14 @@ $esta_cerrada = (!empty($alumnos) && $alumnos[0]['acta_cerrada'] == 'si');
                 </div>
             </form>
             <div style="text-align: center; display: flex; justify-content: center; gap: 20px;">
+                <a href="gestion_calificaciones.php?materia=<?= $materia_id ?>&solicitar=1"
+                       class="btn-dashboard"
+                       style="background-color:#1A5E96; color:white;"
+                       onclick="return confirm('¿Enviar solicitud para reabrir acta al administrativo?')">
+                       Solicitar reabrir las actas
+                    </a>
+
+
                 <?php if (!$esta_cerrada): ?>
                     <a href="gestion_calificaciones.php?materia=<?= $materia_id ?>&cerrar=1" 
                        class="btn-dashboard btn-opcion" 
@@ -183,6 +230,8 @@ $esta_cerrada = (!empty($alumnos) && $alumnos[0]['acta_cerrada'] == 'si');
                        onclick="return confirm('¿Deseas habilitar la edición nuevamente?')">
                        Reabrir para Editar
                     </a>
+
+                    
                 <?php endif; ?>
             </div>
             <br>

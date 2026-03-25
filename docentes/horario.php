@@ -96,7 +96,7 @@ body {
                 </tbody>
             </table>
             <div style="text-align: center;">
-                <a class="btn-dashboard btn-historial" href="docentes.php">Volver</a>
+                <a class="btn-dashboard btn-historial" href="gestion_academica.php">Volver</a>
             </div>
         </div>
     </main>
