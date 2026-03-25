@@ -93,7 +93,9 @@ try {
                     <li><a href="../alumnos/lista_alumnos.php">Alumnos</a></li>
                     <li><a href="docentes.php" class="active">Docentes</a></li>
                     <li><a href="../academica/academica.php">Académica</a></li>
+                    <li><a href="../pagos.php">Pagos</a></li>
                     <li><a href="../reportes.php">Reportes</a></li>
+                    <li><a href="../mensajes.php">Mensajes</a></li>
                     <li><a href="../../logout.php">Salir</a></li>
                 </ul>
             </nav>

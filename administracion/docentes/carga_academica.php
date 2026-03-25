@@ -10,31 +10,54 @@ include '../../conexion.php';
 
 $mensaje = '';
 
-// Si se presionó el botón para asignar la materia
+// Si se envió un formulario por POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $id_docente = $_POST['id_docente'] ?? '';
-    $id_materia = $_POST['id_materia'] ?? '';
-    $id_grupo = $_POST['id_grupo'] ?? '';
-    $id_ciclo = $_POST['id_ciclo'] ?? '';
+    
+    // Acción 1: Guardar una nueva carga académica
+    if (isset($_POST['accion']) && $_POST['accion'] == 'nueva_carga') {
+        $id_docente = $_POST['id_docente'] ?? '';
+        $id_materia = $_POST['id_materia'] ?? '';
+        $id_grupo = $_POST['id_grupo'] ?? '';
+        $id_ciclo = $_POST['id_ciclo'] ?? '';
 
-    if (!empty($id_docente) && !empty($id_materia) && !empty($id_grupo) && !empty($id_ciclo)) {
-        try {
-            $sql_insert = "INSERT INTO carga_academica (id_docente, id_materia, id_grupo, id_ciclo) 
-                           VALUES (?, ?, ?, ?)";
-            $stmt_insert = $pdo->prepare($sql_insert);
-            $stmt_insert->execute([$id_docente, $id_materia, $id_grupo, $id_ciclo]);
-            
-            $mensaje = "<div class='message-box success'>¡Carga académica asignada correctamente al docente!</div>";
-        } catch (PDOException $e) {
-            $mensaje = "<div class='message-box error'>Error al asignar: " . $e->getMessage() . "</div>";
+        if (!empty($id_docente) && !empty($id_materia) && !empty($id_grupo) && !empty($id_ciclo)) {
+            try {
+                // Ponemos acta_abierta = 1 (abierta) por defecto al crear
+                $sql_insert = "INSERT INTO carga_academica (id_docente, id_materia, id_grupo, id_ciclo, acta_abierta) 
+                               VALUES (?, ?, ?, ?, 1)";
+                $stmt_insert = $pdo->prepare($sql_insert);
+                $stmt_insert->execute([$id_docente, $id_materia, $id_grupo, $id_ciclo]);
+                
+                $mensaje = "<div class='message-box success'>¡Carga académica asignada correctamente al docente!</div>";
+            } catch (PDOException $e) {
+                $mensaje = "<div class='message-box error'>Error al asignar: " . $e->getMessage() . "</div>";
+            }
+        } else {
+            $mensaje = "<div class='message-box error'>Por favor, selecciona todas las opciones.</div>";
         }
-    } else {
-        $mensaje = "<div class='message-box error'>Por favor, selecciona todas las opciones.</div>";
+    }
+    
+    // Acción 2: Abrir o Cerrar Acta (El botón mágico)
+    if (isset($_POST['accion']) && $_POST['accion'] == 'toggle_acta') {
+        $id_carga = $_POST['id_carga'];
+        $nuevo_estado = $_POST['nuevo_estado']; // 1 (Abierta) o 0 (Cerrada)
+        
+        try {
+            $sql_toggle = "UPDATE carga_academica SET acta_abierta = ? WHERE id_carga_academica = ?";
+            $stmt_toggle = $pdo->prepare($sql_toggle);
+            $stmt_toggle->execute([$nuevo_estado, $id_carga]);
+            
+            $texto = $nuevo_estado == 1 ? "ABIERTA" : "CERRADA";
+            $mensaje = "<div class='message-box success' style='text-align:center;'>¡El acta ahora está <strong>$texto</strong>!</div>";
+        } catch (PDOException $e) {
+            $mensaje = "<div class='message-box error'>Error al cambiar estado del acta: " . $e->getMessage() . "</div>";
+        }
     }
 }
 
 
 // CONSULTAS PARA LLENAR LOS DESPLEGABLES
+
 $docentes = $pdo->query("SELECT id_docente, nombre_completo FROM docentes WHERE estatus = 'Activo'")->fetchAll();
 $materias = $pdo->query("SELECT id_materia, nombre_materia FROM materias")->fetchAll();
 $grupos = $pdo->query("SELECT id_grupo, nombre_grupo FROM grupos")->fetchAll();
@@ -42,8 +65,10 @@ $ciclos = $pdo->query("SELECT id_ciclo, nombre_periodo FROM ciclos_escolares WHE
 
 
 // CONSULTA PARA VER LAS ASIGNACIONES ACTUALES
+
 try {
-    $sql_cargas = "SELECT ca.id_carga_academica, d.nombre_completo, m.nombre_materia, g.nombre_grupo, c.nombre_periodo 
+    // Le agregamos "ca.acta_abierta" a la consulta
+    $sql_cargas = "SELECT ca.id_carga_academica, ca.acta_abierta, d.nombre_completo, m.nombre_materia, g.nombre_grupo, c.nombre_periodo 
                    FROM carga_academica ca
                    INNER JOIN docentes d ON ca.id_docente = d.id_docente
                    INNER JOIN materias m ON ca.id_materia = m.id_materia
@@ -68,17 +93,25 @@ try {
         img.logo { width: 100px; }
         .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; color: white;}
         .bg-purple { background-color: #6f42c1; }
+        .bg-green { background-color: #28a745; }
+        .bg-red { background-color: #dc3545; }
+        .bg-dark { background-color: #343a40; }
     </style>
 </head>
 <body>
     <header>
         <div class="header-container">
             <img src="../../img/logotec.png" alt="Tec San Pedro" class="logo">
-            <h1>Panel Administrativo</h1>
+            <h1 style="margin: 0 20px;">Panel Administrativo</h1>
             <nav>
                 <ul>
-
+                    <li><a href="../admin.php">Admisión</a></li>
+                    <li><a href="../alumnos/lista_alumnos.php">Alumnos</a></li>
                     <li><a href="docentes.php" class="active">Docentes</a></li>
+                    <li><a href="../academica/academica.php">Académica</a></li>
+                    <li><a href="../pagos.php">Pagos</a></li>
+                    <li><a href="../reportes.php">Reportes</a></li>
+                    <li><a href="../mensajes.php">Mensajes</a></li>
                     <li><a href="../../logout.php">Salir</a></li>
                 </ul>
             </nav>
@@ -86,12 +119,14 @@ try {
     </header>
 
     <main class="main-content">
-        <div class="form-container" style="margin-bottom: 30px;">
+        <div class="form-container" style="max-width: 900px; margin-bottom: 30px;">
             <h2>Asignar Carga Académica a Docente</h2>
             
             <?php echo $mensaje; ?>
 
             <form action="carga_academica.php" method="POST">
+                <input type="hidden" name="accion" value="nueva_carga">
+                
                 <div class="form-row">
                     <div class="form-group">
                         <label>1. Selecciona al Docente</label>
@@ -143,8 +178,8 @@ try {
             </form>
         </div>
 
-        <div class="table-container">
-            <h2>Cargas Académicas Activas</h2>
+        <div class="table-container" style="max-width: 1100px; margin: 0 auto;">
+            <h2>Cargas Académicas y Control de Actas</h2>
             <table class="history-table">
                 <thead>
                     <tr>
@@ -152,6 +187,8 @@ try {
                         <th>Materia Impartida</th>
                         <th>Grupo</th>
                         <th>Periodo</th>
+                        <th>Estatus del Acta</th>
+                        <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -162,11 +199,32 @@ try {
                                 <td><?php echo htmlspecialchars($ca['nombre_materia']); ?></td>
                                 <td><span class="badge bg-purple">Grupo <?php echo htmlspecialchars($ca['nombre_grupo']); ?></span></td>
                                 <td><?php echo htmlspecialchars($ca['nombre_periodo']); ?></td>
+                                <td>
+                                    <?php if(isset($ca['acta_abierta']) && $ca['acta_abierta'] == 1): ?>
+                                        <span class="badge bg-green">Abierta</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-red">Cerrada</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <form action="carga_academica.php" method="POST" style="margin:0;">
+                                        <input type="hidden" name="accion" value="toggle_acta">
+                                        <input type="hidden" name="id_carga" value="<?php echo $ca['id_carga_academica']; ?>">
+                                        
+                                        <?php if(isset($ca['acta_abierta']) && $ca['acta_abierta'] == 1): ?>
+                                            <input type="hidden" name="nuevo_estado" value="0">
+                                            <button type="submit" class="btn-dashboard" style="padding: 6px 10px; font-size: 12px; border:none; cursor:pointer; background-color: #6c757d; color:white;">Cerrar Acta</button>
+                                        <?php else: ?>
+                                            <input type="hidden" name="nuevo_estado" value="1">
+                                            <button type="submit" class="btn-dashboard btn-aceptar" style="padding: 6px 10px; font-size: 12px; border:none; cursor:pointer; background-color: #28a745;">Abrir Acta</button>
+                                        <?php endif; ?>
+                                    </form>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="4" style="text-align: center;">No hay materias asignadas a los docentes todavía.</td>
+                            <td colspan="6" style="text-align: center;">No hay materias asignadas a los docentes todavía.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

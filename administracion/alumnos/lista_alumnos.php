@@ -47,7 +47,9 @@ try {
                     <li><a href="lista_alumnos.php" class="active">Alumnos</a></li>
                     <li><a href="../docentes/docentes.php">Docentes</a></li>
                     <li><a href="../academica/academica.php">Académica</a></li>
+                    <li><a href="../pagos.php">Pagos</a></li>
                     <li><a href="../reportes.php">Reportes</a></li>
+                    <li><a href="../mensajes.php">Mensajes</a></li>
                     <li><a href="../../logout.php">Salir</a></li>
                 </ul>
             </nav>
@@ -93,8 +95,12 @@ try {
                                     <?php endif; ?>
                                 </td>
 
-                                <td>
-                                    <a href="asignar_alumno.php?id=<?php echo $alum['id_alumno']; ?>" class="btn-details" style="text-decoration:none;">Editar / Asignar</a>
+                                <td style="white-space: nowrap; text-align: center;">
+                                    <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+                                        <a href="asignar_alumno.php?id=<?php echo $alum['id_alumno']; ?>" class="btn-details" style="text-decoration:none; display:inline-block; padding:8px 15px; width: 140px; box-sizing: border-box;">Editar / Grupo</a>
+                                        
+                                        <a href="carga_alumno.php?id=<?php echo $alum['id_alumno']; ?>" class="btn-primary" style="text-decoration:none; display:inline-block; padding:8px 15px; width: 140px; box-sizing: border-box; background-color: #007bff;">Materias</a>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
