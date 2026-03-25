@@ -101,7 +101,7 @@ body {
         <div class="opciones">
             <div class="seccion">
                 <h3>Grupos asignados</h3>
-                <p>Ver los grupos y materias asignadas.</p>
+                <p>Ver los grupos y materia asignada.</p>
                 <a href="grupos.php">Consultar</a>
             </div>
 
