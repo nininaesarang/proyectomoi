@@ -2,7 +2,7 @@
 session_start();
 require '../conexion.php';
 
-$sql = "SELECT alumnos.matricula,
+$sql = "SELECT alumnos.matricula, nombre_completo,
        usuarios.correo,
        grupos.nombre_grupo
 FROM alumnos
@@ -58,6 +58,7 @@ body {
                 <thead>
                     <tr>
                         <th>Matrícula</th>
+                        <th>Nombre</th>
                         <th>Correo</th>
                         <th>Grupo</th>
                     </tr>
@@ -67,18 +68,19 @@ body {
                         <?php foreach($alumnos as $datitos): ?>
                             <tr>
                                 <td><?php echo $datitos['matricula']; ?></td>
+                                <td><?php echo $datitos['nombre_completo']; ?></td>
                                 <td><?php echo $datitos['correo']; ?></td>
                                 <td><?php echo $datitos['nombre_grupo']; ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="3" style="text-align: center;">Aún no hay alumnos registrados.</td>
+                            <td colspan="4" style="text-align: center;">Aún no hay alumnos registrados.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
-            <a href="docentes.php" class="btn-dashboard btn-historial">Volver</a>
+            <a href="gestion_academica.php" class="btn-dashboard btn-historial">Volver</a>
         </div>
     </main>
 </body>
