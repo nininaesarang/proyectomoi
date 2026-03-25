@@ -7,7 +7,6 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
 
 include '../../conexion.php';
 
-// Consultamos solo a los alumnos activos para revisar su Kárdex
 try {
     $sql = "SELECT id_alumno, matricula, nombre_completo, semestre_actual FROM alumnos ORDER BY semestre_actual ASC";
     $stmt = $pdo->query($sql);
@@ -45,7 +44,7 @@ try {
 
     <main class="main-content">
         <div class="table-container" style="max-width: 900px;">
-            <h2>Control de Retículas y Kárdex</h2>
+            <h2>Control del Kárdex</h2>
             <p style="text-align:center; margin-bottom:20px;">Selecciona un alumno para revisar su historial de calificaciones y materias cursadas.</p>
 
             <table class="history-table">

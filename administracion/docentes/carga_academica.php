@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Seguridad
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
     header("Location: ../../index.php");
     exit;
@@ -10,10 +10,9 @@ include '../../conexion.php';
 
 $mensaje = '';
 
-// Si se envió un formulario por POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    // Acción 1: Guardar una nueva carga académica
+
     if (isset($_POST['accion']) && $_POST['accion'] == 'nueva_carga') {
         $id_docente = $_POST['id_docente'] ?? '';
         $id_materia = $_POST['id_materia'] ?? '';
@@ -22,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (!empty($id_docente) && !empty($id_materia) && !empty($id_grupo) && !empty($id_ciclo)) {
             try {
-                // Ponemos acta_abierta = 1 (abierta) por defecto al crear
+                
                 $sql_insert = "INSERT INTO carga_academica (id_docente, id_materia, id_grupo, id_ciclo, acta_abierta) 
                                VALUES (?, ?, ?, ?, 1)";
                 $stmt_insert = $pdo->prepare($sql_insert);
@@ -37,10 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     
-    // Acción 2: Abrir o Cerrar Acta (El botón mágico)
+
     if (isset($_POST['accion']) && $_POST['accion'] == 'toggle_acta') {
         $id_carga = $_POST['id_carga'];
-        $nuevo_estado = $_POST['nuevo_estado']; // 1 (Abierta) o 0 (Cerrada)
+        $nuevo_estado = $_POST['nuevo_estado']; 
         
         try {
             $sql_toggle = "UPDATE carga_academica SET acta_abierta = ? WHERE id_carga_academica = ?";
@@ -56,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 
-// CONSULTAS PARA LLENAR LOS DESPLEGABLES
+
 
 $docentes = $pdo->query("SELECT id_docente, nombre_completo FROM docentes WHERE estatus = 'Activo'")->fetchAll();
 $materias = $pdo->query("SELECT id_materia, nombre_materia FROM materias")->fetchAll();
@@ -64,10 +63,10 @@ $grupos = $pdo->query("SELECT id_grupo, nombre_grupo FROM grupos")->fetchAll();
 $ciclos = $pdo->query("SELECT id_ciclo, nombre_periodo FROM ciclos_escolares WHERE activo = 'Sí'")->fetchAll();
 
 
-// CONSULTA PARA VER LAS ASIGNACIONES ACTUALES
+
 
 try {
-    // Le agregamos "ca.acta_abierta" a la consulta
+    
     $sql_cargas = "SELECT ca.id_carga_academica, ca.acta_abierta, d.nombre_completo, m.nombre_materia, g.nombre_grupo, c.nombre_periodo 
                    FROM carga_academica ca
                    INNER JOIN docentes d ON ca.id_docente = d.id_docente

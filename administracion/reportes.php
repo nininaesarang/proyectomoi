@@ -8,7 +8,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
 include '../conexion.php';
 
 
-// 1. CONSULTAS PARA LAS TARJETAS DE CONTEO
+
 try {
     $total_alumnos = $pdo->query("SELECT COUNT(*) FROM alumnos WHERE estatus = 'Activo'")->fetchColumn();
     $total_docentes = $pdo->query("SELECT COUNT(*) FROM docentes WHERE estatus = 'Activo'")->fetchColumn();
@@ -18,7 +18,7 @@ try {
     echo "Error en los contadores: " . $e->getMessage();
 }
 
-// 2. CONSULTA PARA LA LISTA DE GRUPOS
+
 try {
     $sql_grupos = "SELECT g.nombre_grupo, c.nombre_periodo, 
                    (SELECT COUNT(*) FROM alumnos a WHERE a.id_grupo = g.id_grupo AND a.estatus = 'Activo') as cantidad_alumnos
@@ -74,26 +74,32 @@ try {
     </header>
 
     <main class="main-content">
-        <h2>📊 Métricas y Estado del Plantel</h2>
-        <p style="text-align: center; margin-bottom: 30px; color: #555;">Resumen en tiempo real de la infraestructura escolar.</p>
+        <h2>Registros Totales</h2>
+        <p style="text-align: center; margin-bottom: 30px; color: #555;"></p>
 
-        <div class="kpi-container" style="max-width: 1100px; margin: 0 auto 30px auto;">
-            <div class="kpi-card" style="border-bottom-color: #007bff;">
-                <h3>Alumnos Activos</h3>
-                <p class="number"><?php echo $total_alumnos; ?></p>
+        <div style="background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 6px; display: flex; justify-content: space-around; padding: 20px 10px; margin: 0 auto 35px auto; max-width: 1100px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+            
+            <div style="text-align: center; width: 25%;">
+                <span style="display: block; font-size: 28px; font-weight: bold; color: #111827;"><?php echo $total_alumnos; ?></span>
+                <span style="color: #6b7280; font-size: 13px; text-transform: uppercase;">Alumnos</span>
             </div>
-            <div class="kpi-card" style="border-bottom-color: #28a745;">
-                <h3>Docentes Activos</h3>
-                <p class="number"><?php echo $total_docentes; ?></p>
+            
+            <div style="text-align: center; width: 25%; border-left: 1px solid #e5e7eb;">
+                <span style="display: block; font-size: 28px; font-weight: bold; color: #111827;"><?php echo $total_docentes; ?></span>
+                <span style="color: #6b7280; font-size: 13px; text-transform: uppercase;">Docentes</span>
             </div>
-            <div class="kpi-card" style="border-bottom-color: #ffc107;">
-                <h3>Materias</h3>
-                <p class="number"><?php echo $total_materias; ?></p>
+            
+            <div style="text-align: center; width: 25%; border-left: 1px solid #e5e7eb;">
+                <span style="display: block; font-size: 28px; font-weight: bold; color: #111827;"><?php echo $total_materias; ?></span>
+                <span style="color: #6b7280; font-size: 13px; text-transform: uppercase;">Materias</span>
             </div>
-            <div class="kpi-card" style="border-bottom-color: #6f42c1;">
-                <h3>Grupos Abiertos</h3>
-                <p class="number"><?php echo $total_grupos; ?></p>
+            
+            <div style="text-align: center; width: 25%; border-left: 1px solid #e5e7eb;">
+                <span style="display: block; font-size: 28px; font-weight: bold; color: #111827;"><?php echo $total_grupos; ?></span>
+                <span style="color: #6b7280; font-size: 13px; text-transform: uppercase;">Grupos</span>
             </div>
+
+        </div>
         </div>
 
         <div class="table-container" style="max-width: 1100px; margin: 0 auto;">

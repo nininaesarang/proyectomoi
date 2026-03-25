@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Seguridad
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
     header("Location: ../../index.php");
     exit;
@@ -10,14 +10,13 @@ include '../../conexion.php';
 
 $mensaje = '';
 
-// Si se envió el formulario para guardar un nuevo grupo
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre_grupo = trim($_POST['nombre_grupo'] ?? '');
     $id_ciclo = $_POST['id_ciclo'] ?? '';
 
     if (!empty($nombre_grupo) && !empty($id_ciclo)) {
         try {
-            // Guardamos el grupo amarrado a su ciclo escolar
             $sql_insert = "INSERT INTO grupos (id_ciclo, nombre_grupo) VALUES (?, ?)";
             $stmt_insert = $pdo->prepare($sql_insert);
             $stmt_insert->execute([$id_ciclo, $nombre_grupo]);
@@ -31,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// 1. Consultamos los ciclos para mostrarlos en el select (desplegable)
+
 try {
     $sql_ciclos = "SELECT * FROM ciclos_escolares ORDER BY id_ciclo DESC";
     $stmt_ciclos = $pdo->query($sql_ciclos);
@@ -40,7 +39,7 @@ try {
     echo "Error al cargar ciclos: " . $e->getMessage();
 }
 
-// 2. Consultamos los grupos registrados haciendo un JOIN para traer el nombre del periodo
+
 try {
     $sql_grupos = "SELECT g.id_grupo, g.nombre_grupo, c.nombre_periodo 
                    FROM grupos g 
