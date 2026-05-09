@@ -11,27 +11,20 @@ if(!isset($_SESSION['id_usuario'])){
 $id_logueado = $_SESSION['id_usuario'];
 $error_message = null;
 
+// bloque de datos post
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nuevo_correo = $_POST['correo'] ?? '';
     $nuevo_telefono = $_POST['telefono'] ?? '';
 
-    if($nuevo_correo && $nuevo_telefono){
+    if(!empty($nuevo_correo) && !empty($nuevo_telefono)){
         try {
-            $pdo->beginTransaction();
-            
-            $sql1 = "UPDATE usuarios SET correo = ? WHERE id_usuario = ?";
-            $stmt1 = $pdo->prepare($sql1);
-            $stmt1->execute([$nuevo_correo, $id_logueado]);
+            $stmt_upd = $pdo->prepare("CALL actualizar_perfil(?, ?, ?)");
+            $stmt_upd->execute([$id_logueado, $nuevo_telefono, $nuevo_correo]);
+            $stmt_upd->closeCursor();
 
-            $sql2 = "UPDATE alumnos SET telefono = ? WHERE id_usuario = ?";
-            $stmt2 = $pdo->prepare($sql2);
-            $stmt2->execute([$nuevo_telefono, $id_logueado]);
-
-            $pdo->commit();
             header("Location: perfil.php?msg=actualizado_exitoso");
             exit();
         } catch(PDOException $e) {
-            $pdo->rollBack();
             $error_message = "Error al actualizar: " . $e->getMessage();
         }
     } else {
@@ -39,30 +32,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// --- BLOQUE DE CARGA DE DATOS (GET) ---
 try {
-    $sql_perfil =
-    "SELECT a.*, g.nombre_grupo, u.correo 
-    FROM alumnos a 
-    left JOIN usuarios u ON a.id_usuario = u.id_usuario 
-    left JOIN grupos g ON a.id_grupo = g.id_grupo 
-    WHERE a.id_usuario = ?";
-    $stmt_p = $pdo->prepare($sql_perfil);
+    $stmt_p = $pdo->prepare("CALL consultar_perfil(?)");
     $stmt_p->execute([$id_logueado]);
     $perfil = $stmt_p->fetch(PDO::FETCH_ASSOC);
+    $stmt_p->closeCursor();
+
+    $stmt_ss = $pdo->prepare("CALL menu_ss(?)");
+    $stmt_ss->execute([$id_logueado]);
+    $tiene_registro_ss = (int)$stmt_ss->fetchColumn() > 0;
+    $stmt_ss->closeCursor();
+
     if (!$perfil) {
         $perfil = [
             'matricula' => 'No disponible',
             'carrera' => 'No disponible',
             'semestre_actual' => 'N/A',
-            'telefono' => 'N/A',
-            'correo' => 'N/A',
+            'telefono' => '',
+            'correo' => '',
             'estatus' => 'Sin registro',
             'creditos' => '0',
             'nombre_grupo' => 'Sin grupo'
         ];
     }
 } catch(PDOException $e) {
-    $error_message = "Error al cargar perfil: " . $e->getMessage();
+    $error_message = "Error en el sistema: " . $e->getMessage();
 }
 ?>
 
@@ -115,30 +110,30 @@ try {
             <h2>Datos Personales</h2>
             <br>
             <label>Matrícula:</label> 
-            <input type="text" value="<?php echo htmlspecialchars($perfil['matricula']); ?>" readonly>
+            <input type="text" value="<?php echo htmlspecialchars($perfil['matricula'] ?? ''); ?>" readonly>
             <br><br>
             <label>Carrera:</label> 
-            <input type="text" value="<?php echo htmlspecialchars($perfil['carrera']); ?>" readonly>
+            <input type="text" value="<?php echo htmlspecialchars($perfil['carrera'] ?? ''); ?>" readonly>
             <br><br>
             <label>Semestre actual:</label>
-            <input type="text" id="semestre_actual" name="semestre_actual" value="<?php echo htmlspecialchars($perfil['semestre_actual']);?>" readonly>
+            <input type="text" id="semestre_actual" name="semestre_actual" value="<?php echo htmlspecialchars($perfil['semestre_actual'] ?? '');?>" readonly>
             <br> <br>
             <label>Teléfono:</label> 
-            <input type="text" name="telefono" required maxlength="10" value="<?php echo htmlspecialchars($perfil['telefono']); ?>">
+            <input type="text" name="telefono" required maxlength="10" value="<?php echo htmlspecialchars($perfil['telefono'] ?? ''); ?>">
             <small>Ingresa 10 dígitos. Ejemplo: 1234567890</small>
             <br><br>
             <label>Correo:</label> 
-            <input type="email" name="correo" required value="<?php echo htmlspecialchars($perfil['correo']); ?>">
+            <input type="email" name="correo" required value="<?php echo htmlspecialchars($perfil['correo'] ?? ''); ?>">
             <small>Ingresa el formato ejemplo@dominio.com</small>
             <br><br>
             <label>Estado: </label>
-            <input type="text" id="estatus" name="estatus" value="<?php echo htmlspecialchars($perfil['estatus']);?>" readonly>
+            <input type="text" id="estatus" name="estatus" value="<?php echo htmlspecialchars($perfil['estatus'] ?? '');?>" readonly>
             <br> <br>
             <label>Créditos: </label>
-            <input type="text" id="creditos" name="creditos" value="<?php echo htmlspecialchars($perfil['creditos']);?>" readonly>
+            <input type="text" id="creditos" name="creditos" value="<?php echo htmlspecialchars($perfil['creditos'] ?? '');?>" readonly>
             <br> <br>
             <label>Grupo:</label> 
-            <input type="text" value="<?php echo htmlspecialchars($perfil['nombre_grupo']); ?>" readonly>
+            <input type="text" value="<?php echo htmlspecialchars($perfil['nombre_grupo'] ?? ''); ?>" readonly>
             <br><br>
             <div class="form-actions">
                 <button type="submit" class="btn-dashboard btn-aceptar">Guardar Cambios</button>

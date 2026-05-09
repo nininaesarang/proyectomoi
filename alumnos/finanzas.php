@@ -14,28 +14,21 @@ if(isset($_GET['msg'])){
 
 $id_logueado = $_SESSION['id_usuario'];
 
-try{
-    $sql = "SELECT a.matricula,
-    fa.concepto_pago,
-    fa.fecha_vencimiento,
-    fa.pagado,
-    fa.referencia_bancaria,
-    fa.monto
-    FROM
-    alumnos a
-    left join
-    finanzas_adeudos fa on a.id_alumno = fa.id_alumno
-    WHERE a.id_usuario = ?
-    ORDER BY fa.fecha_vencimiento ASC";
-    $stmt = $pdo->prepare($sql);
+try {
+    $stmt = $pdo->prepare("CALL consultar_pagos(?)");
     $stmt->execute([$id_logueado]);
     $todos_pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+
+    $stmt_ss = $pdo->prepare("CALL menu_ss(?)");
+    $stmt_ss->execute([$id_logueado]);
+    $tiene_registro_ss = (int)$stmt_ss->fetchColumn() > 0;
+    $stmt_ss->closeCursor();
 
     $pagos_realizados = array_filter($todos_pagos, function($pago) {
     return strtolower(trim($pago['pagado'])) === 'pagado'; 
 });
 
-// Filtramos los pendientes (comparamos contra 'pendiente' en minúsculas)
 $pagos_pendientes = array_filter($todos_pagos, function($pago) {
     return strtolower(trim($pago['pagado'])) === 'pendiente';
 });
@@ -44,6 +37,7 @@ catch(PDOException $e){
     $error_message = "Error al cargar las tareas: " . $e->getMessage();
     $pagos_pendientes = [];
     $pagos_realizados = [];
+    $tiene_registro_ss = false;
 }
 ?>
 

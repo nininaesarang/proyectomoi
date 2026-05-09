@@ -12,22 +12,15 @@ if(isset($_GET['msg'])){
 }
 
 try{
-    $sql = "SELECT a.*,
-    u.correo,
-    ss.horas_liberadas,
-    ss.ruta_carta_aceptacion,
-    ss.ruta_carta_liberacion,
-    ss.ruta_reporte1,
-    ss.ruta_reporte2,
-    ss.ruta_reporte3
-    FROM
-    alumnos a
-    inner join usuarios u on a.id_usuario = u.id_usuario
-    left join servicio_social ss on a.id_alumno = ss.id_alumno
-    where a.id_usuario = ?";
-    $stmt = $pdo->prepare($sql);
+    $stmt=$pdo->prepare("CALL servicio(?)");
     $stmt->execute([$id_logueado]);
     $servicio = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+
+    $stmt_ss = $pdo->prepare("CALL menu_ss(?)");
+    $stmt_ss->execute([$id_logueado]);
+    $tiene_registro_ss = (int)$stmt_ss->fetchColumn() > 0;
+    $stmt_ss->closeCursor();
     if (!$servicio) {
         $servicio = [];
     }

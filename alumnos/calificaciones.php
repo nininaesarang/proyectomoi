@@ -14,51 +14,27 @@ if(isset($_GET['msg'])){
 
 $id_logueado = $_SESSION['id_usuario'];
 
-try{
-    $sql = "SELECT g.nombre_grupo,
-    m.nombre_materia,
-    d.nombre_completo,
-    cal.unidad_1,
-    cal.unidad_2,
-    cal.unidad_3, 
-    cal.unidad_4,
-    cal.unidad_5,
-    cal.unidad_6, 
-    cal.promedio_final,
-    ce.nombre_periodo
-    FROM alumnos a
-    inner join grupos g on a.id_grupo = g.id_grupo
-    inner join carga_academica ca on g.id_grupo = ca.id_grupo
-    inner join materias m on m.id_materia = ca.id_materia
-    inner join docentes d on d.id_docente = ca.id_docente
-    inner join ciclos_escolares ce on ce.id_ciclo = ca.id_ciclo
-    left join calificaciones_activas cal ON cal.id_alumno = a.id_alumno
-    AND cal.id_materia = m.id_materia
-    where a.id_usuario = ?
-    ORDER BY m.nombre_materia ASC";
-    
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$id_logueado]);
-    $calif = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $stmt_calif = $pdo->prepare("CALL consultar_calificaciones(?)");
+    $stmt_calif->execute([$id_logueado]);
+    $calif= $stmt_calif->fetchAll(PDO::FETCH_ASSOC);
+    $stmt_calif->closeCursor();
 
-    $sql_kardex = "SELECT k.calificacion_definitiva,
-    k.estatus_aprobacion, k.oportunidad, 
-    m.nombre_materia, ce.nombre_periodo
-    FROM alumnos a
-    inner join kardex k on k.id_alumno = a.id_alumno
-    inner join materias m on k.id_materia = m.id_materia
-    inner join ciclos_escolares ce on ce.id_ciclo = k.id_ciclo
-    where a.id_usuario = ?
-    ORDER BY ce.id_ciclo DESC, m.nombre_materia ASC";
-                   
-    $stmt_k = $pdo->prepare($sql_kardex);
+    $stmt_k = $pdo->prepare("CALL consultar_kardex(?)");
     $stmt_k->execute([$id_logueado]);
-    $kardex_data = $stmt_k->fetchAll(PDO::FETCH_ASSOC);
-}
-catch(PDOException $e){
-    $error_message = "Error al cargar " . $e->getMessage();
+    $kardex_data=$stmt_k->fetchAll(PDO::FETCH_ASSOC);
+    $stmt_k->closeCursor();
+
+    $stmt_ss = $pdo->prepare("CALL menu_ss(?)");
+    $stmt_ss->execute([$id_logueado]);
+    $tiene_registro_ss = (int)$stmt_ss->fetchColumn() > 0;
+    $stmt_ss->closeCursor(); 
+
+} catch (PDOException $e) {
+    $error_message = "Error en el sistema: " . $e->getMessage();
     $calif = [];
     $kardex_data = [];
+    $tiene_registro_ss = false;
 }
 
 date_default_timezone_set('America/Mexico_City');

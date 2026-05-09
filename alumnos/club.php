@@ -13,33 +13,20 @@ if(isset($_GET['msg'])){
 }
 
 try{
-    $sql = "SELECT a.*, g.nombre_grupo, u.correo, ac.nombre_actividad
-    FROM
-    alumnos a
-    left join usuarios u on a.id_usuario = u.id_usuario
-    left join grupos g on a.id_grupo = g.id_grupo
-    left join actividades_complementarias ac on a.id_alumno = ac.id_alumno
-    where a.id_usuario = ?";
-    $stmt = $pdo->prepare($sql);
+    $stmt = $pdo->prepare("CALL consultar_club(?)");
     $stmt->execute([$id_logueado]);
     $club = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$club) {
-        $club = [
-            'matricula' => 'No disponible',
-            'carrera' => 'No disponible',
-            'semestre_actual' => 'N/A',
-            'telefono' => 'N/A',
-            'correo' => 'N/A',
-            'estatus' => 'Sin registro',
-            'nombre_actividad' => 'Sin registro',
-            'creditos' => '0',
-            'nombre_grupo' => 'Sin grupo'
-        ];
-    }
+    $stmt->closeCursor();
+
+    $stmt_ss = $pdo->prepare("CALL menu_ss(?)");
+    $stmt_ss->execute([$id_logueado]);
+    $tiene_registro_ss = (int)$stmt_ss->fetchColumn() > 0;
+    $stmt_ss->closeCursor();
 }
 catch(PDOException $e){
     $error_message = "Error al cargar las tareas: " . $e->getMessage();
     $club = [];
+    $tiene_registro_ss = false;
 }
 ?>
 
@@ -91,31 +78,31 @@ body {
             <h1>Datos personales</h1>
             <div class=" form-container form-group">
                 <label>Matrícula:</label>
-                <input type="text" id="matricula" name="matricula" value="<?php echo htmlspecialchars($club['matricula']);?>" readonly>
+                <input type="text" id="matricula" name="matricula" value="<?php echo htmlspecialchars($club['matricula'] ?? '');?>" readonly>
                 <br> <br>
                 <label>Carrera:</label>
-                <input type="text" id="carrera" name="carrera" value="<?php echo htmlspecialchars($club['carrera']);?>" readonly>
+                <input type="text" id="carrera" name="carrera" value="<?php echo htmlspecialchars($club['carrera'] ?? '');?>" readonly>
                 <br> <br>
                 <label>Semestre actual:</label>
-                <input type="text" id="semestre_actual" name="semestre_actual" value="<?php echo htmlspecialchars($club['semestre_actual']);?>" readonly>
+                <input type="text" id="semestre_actual" name="semestre_actual" value="<?php echo htmlspecialchars($club['semestre_actual'] ?? '');?>" readonly>
                 <br> <br>
                 <label>Teléfono: </label>
-                <input type="text" id="telefono" name="telefono" value="<?php echo htmlspecialchars($club['telefono']);?>" readonly>
+                <input type="text" id="telefono" name="telefono" value="<?php echo htmlspecialchars($club['telefono'] ?? '');?>" readonly>
                 <br> <br>
                 <label>Correo: </label>
-                <input type="text" id="correo" name="correo" value="<?php echo htmlspecialchars($club['correo']);?>" readonly>
+                <input type="text" id="correo" name="correo" value="<?php echo htmlspecialchars($club['correo'] ?? '');?>" readonly>
                 <br> <br>
                 <label>Estado: </label>
-                <input type="text" id="estatus" name="estatus" value="<?php echo htmlspecialchars($club['estatus']);?>" readonly>
+                <input type="text" id="estatus" name="estatus" value="<?php echo htmlspecialchars($club['estatus'] ?? '');?>" readonly>
                 <br> <br>
                 <label>Club Escolar: </label> 
-                <input type="text" name="club" value="<?php echo htmlspecialchars($club['nombre_actividad']); ?>" readonly>
+                <input type="text" name="club" value="<?php echo htmlspecialchars($club['nombre_actividad'] ?? ''); ?>" readonly>
                 <br><br>
                 <label>Créditos: </label>
-                <input type="text" id="creditos" name="creditos" value="<?php echo htmlspecialchars($club['creditos']);?>" readonly>
+                <input type="text" id="creditos" name="creditos" value="<?php echo htmlspecialchars($club['creditos'] ?? '');?>" readonly>
                 <br> <br>
                 <label>Grupo: </label>
-                <input type="text" id="nombre_grupo" name="nombre_grupo" value="<?php echo htmlspecialchars($club['nombre_grupo']);?>" readonly>                                             
+                <input type="text" id="nombre_grupo" name="nombre_grupo" value="<?php echo htmlspecialchars($club['nombre_grupo'] ?? '');?>" readonly>                                             
             </div>
             <br>
             <h3>Incribirse al Club Escolar: <a class="btn-dashboard btn-opcion" href="actualizar_club.php">Inscribirse</a></h3>

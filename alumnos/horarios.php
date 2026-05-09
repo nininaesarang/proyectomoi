@@ -14,32 +14,21 @@ if(isset($_GET['msg'])){
 
 $id_logueado = $_SESSION['id_usuario'];
 
-try{
-    $sql = "SELECT g.nombre_grupo,
-    h.dia_semana,
-    h.hora_inicio,
-    h.hora_fin,
-    h.aula,
-    m.nombre_materia,
-    d.nombre_completo,
-    ce.nombre_periodo
-    FROM alumnos a
-    inner join grupos g on a.id_grupo = g.id_grupo
-    inner join carga_academica ca on g.id_grupo = ca.id_grupo
-    inner join horarios h on h.id_carga_academica = ca.id_carga_academica
-    inner join materias m on m.id_materia = ca.id_materia
-    inner join docentes d on d.id_docente = ca.id_docente
-    inner join ciclos_escolares ce on ce.id_ciclo = ca.id_ciclo
-    where a.id_usuario = ?
-    ORDER BY FIELD(h.dia_semana, 'lunes', 'martes', 'miercoles', 'jueves', 'viernes'), h.hora_inicio ASC";
+try {
+    $stmt_horario = $pdo->prepare("CALL consultar_horario(?)");
+    $stmt_horario->execute([$id_logueado]);
+    $horario = $stmt_horario->fetchAll(PDO::FETCH_ASSOC);
+    $stmt_horario->closeCursor();
     
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$id_logueado]);
-    $horario = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-catch(PDOException $e){
-    $error_message = "Error al cargar el horario " . $e->getMessage();
+    $stmt_ss = $pdo->prepare("CALL menu_ss(?)");
+    $stmt_ss->execute([$id_logueado]);
+    $tiene_registro_ss = (int)$stmt_ss->fetchColumn() > 0;
+    $stmt_ss->closeCursor(); 
+
+} catch (PDOException $e) {
+    $error_message = "Error en el sistema: " . $e->getMessage();
     $horario = [];
+    $tiene_registro_ss = false;
 }
 
 date_default_timezone_set('America/Mexico_City');
@@ -131,14 +120,14 @@ date_default_timezone_set('America/Mexico_City');
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if(count($materias_dias) > 0): ?>
+                                <?php if(!empty($materias_dias)): ?>
                                     <?php foreach($materias_dias as $row): ?>
                                         <tr>
                                             <td>
                                                 <strong><?php echo htmlspecialchars($row['nombre_materia']); ?></strong><br>
                                                 <small><?php echo htmlspecialchars($row['nombre_completo']); ?></small>
                                             </td>
-                                            <td><?php echo date('H:i A', strtotime($row['hora_inicio'])) . " a " . date('H:i A', strtotime($row['hora_fin'])); ?></td>
+                                            <td><?php echo date('H:i A', strtotime($row['hora_inicio'])) . " a " . date('H:i A', strtotime($row['hora_fin']) ?? ''); ?></td>
                                             <td><?php echo htmlspecialchars($row['aula']); ?></td>
                                         </tr>
                                     <?php endforeach; ?>

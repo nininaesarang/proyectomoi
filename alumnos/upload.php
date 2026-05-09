@@ -6,23 +6,15 @@ $id_logueado = $_SESSION['id_usuario'];
 $target_dir = "../uploads/";
 
 if(isset($_POST["submit"])) {
-
-    $mapa_columnas = [
-        'aceptacion' => 'ruta_carta_aceptacion',
-        'liberacion' => 'ruta_carta_liberacion',
-        'reporte1'   => 'ruta_reporte1',
-        'reporte2'   => 'ruta_reporte2',
-        'reporte3'   => 'ruta_reporte3'
-    ];
     $tipo = $_POST['tipo_documento'];
     $uploadOk = 1;
-    $columna = $mapa_columnas[$tipo] ?? null;
     
-    $stmt_id = $pdo->prepare("SELECT id_alumno, matricula FROM alumnos WHERE id_usuario = ?");
+    $stmt_id = $pdo->prepare("CALL formato_pdf(?)");
     $stmt_id->execute([$id_logueado]);
     $alumno = $stmt_id->fetch();
     $id_alumno = $alumno['id_alumno'];
     $matricula = $alumno['matricula'];
+    $stmt_id->closeCursor();
 
     $fileName = $matricula . "_" . $tipo . "_" . time() . ".pdf";
     $target_file = $target_dir . $fileName;
@@ -34,7 +26,7 @@ if(isset($_POST["submit"])) {
     }
 
     if ($_FILES["fileUpload"]["size"] > 5000000) {
-        echo "Error: El archivo es demasiado grande.";
+        echo "Error: El archivo es demasiado grande (Máx 5MB).";
         $uploadOk = 0;
     }
 
@@ -42,9 +34,29 @@ if(isset($_POST["submit"])) {
         if (move_uploaded_file($_FILES["fileUpload"]["tmp_name"], $target_file)) {
             
             try {
-                $sql = "UPDATE servicio_social SET $columna = ? WHERE id_alumno = ?";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([$target_file, $id_alumno]);
+                $p_aceptacion = null;
+                $p_liberacion = null;
+                $p_reporte1 = null;
+                $p_reporte2 = null;
+                $p_reporte3 = null;
+
+                switch($tipo) {
+                    case 'aceptacion': $p_aceptacion = $target_file; break;
+                    case 'liberacion': $p_liberacion = $target_file; break;
+                    case 'reporte1':   $p_reporte1   = $target_file; break;
+                    case 'reporte2':   $p_reporte2   = $target_file; break;
+                    case 'reporte3':   $p_reporte3   = $target_file; break;
+                }
+
+                $stmt = $pdo->prepare("CALL subir_archivos_servicio(?, ?, ?, ?, ?, ?)");
+                $stmt->execute([
+                    $id_alumno, 
+                    $p_aceptacion, 
+                    $p_liberacion, 
+                    $p_reporte1, 
+                    $p_reporte2, 
+                    $p_reporte3
+                ]);
                 
                 header("Location: servicio.php?msg=subida_exitosa");
             } catch(PDOException $e) {

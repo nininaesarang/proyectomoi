@@ -12,48 +12,36 @@ $id_logueado = $_SESSION['id_usuario'];
 $error_message = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $reinscripcion = $_POST['club'] ?? '';
+    $nueva_actividad = $_POST['club'] ?? '';
 
-    if($reinscripcion){
+    if(!empty($nueva_actividad)){
         try {
-            $stmt_id = $pdo->prepare("SELECT id_alumno FROM alumnos WHERE id_usuario = ?");
-            $stmt_id->execute([$id_logueado]);
-            $alumno = $stmt_id->fetch(PDO::FETCH_ASSOC);
-            $id_alumno = $alumno['id_alumno'] ?? null;
+            $stmt_upd = $pdo->prepare("CALL actualizar_club(?, ?)");
+            $stmt_upd->execute([$id_logueado, $nueva_actividad]);
+            $stmt_upd->closeCursor();
 
-            if ($id_alumno) {
-                $pdo->beginTransaction();
-                
-                $sql = "UPDATE actividades_complementarias SET nombre_actividad = ? WHERE id_alumno = ?";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([$reinscripcion, $id_alumno]);
-                
-                $pdo->commit();
-                header("Location: club.php?msg=actualizado_exitoso");
-                exit();
-            } else {
-                $error_message = "No se encontró un registro de alumno vinculado a este usuario.";
-            }
+            header("Location: club.php?msg=actualizado_exitoso");
+            exit();
         } catch(PDOException $e) {
-            $pdo->rollBack();
-            $error_message = "Error al actualizar: " . $e->getMessage();
+            $error_message = "Error al actualizar la inscripción: " . $e->getMessage();
         }
     } else {
-        $error_message = "Por favor, completa todos los campos.";
+        $error_message = "Por favor, ingresa el nombre del club.";
     }
 }
 
+// --- CARGA DE DATOS PARA LA VISTA (GET) ---
 try {
-    $sql_club =
-    "SELECT a.*, g.nombre_grupo, u.correo, ac.nombre_actividad
-    FROM alumnos a 
-    LEFT JOIN usuarios u ON a.id_usuario = u.id_usuario 
-    LEFT JOIN grupos g ON a.id_grupo = g.id_grupo
-    left join actividades_complementarias ac on a.id_alumno = ac.id_alumno
-    WHERE a.id_usuario = ?";
-    $stmt_c = $pdo->prepare($sql_club);
+    $stmt_c = $pdo->prepare("CALL consultar_club(?)");
     $stmt_c->execute([$id_logueado]);
     $club = $stmt_c->fetch(PDO::FETCH_ASSOC);
+    $stmt_c->closeCursor();
+
+    $stmt_ss = $pdo->prepare("CALL menu_ss(?)");
+    $stmt_ss->execute([$id_logueado]);
+    $tiene_registro_ss = (int)$stmt_ss->fetchColumn() > 0;
+    $stmt_ss->closeCursor();
+
     if (!$club) {
         $club = [
             'matricula' => 'No disponible',
@@ -62,13 +50,14 @@ try {
             'telefono' => 'N/A',
             'correo' => 'N/A',
             'estatus' => 'Sin registro',
-            'nombre_actividad' => 'Sin registro',
+            'nombre_actividad' => '',
             'creditos' => '0',
             'nombre_grupo' => 'Sin grupo'
         ];
     }
 } catch(PDOException $e) {
-    $error_message = "Error al cargar perfil: " . $e->getMessage();
+    $error_message = "Error al cargar la información: " . $e->getMessage();
+    $tiene_registro_ss = false;
 }
 ?>
 
@@ -121,28 +110,28 @@ try {
             <h1>Reinscripción al club</h1>
             <br>
             <label>Matrícula:</label> 
-            <input type="text" value="<?php echo htmlspecialchars($club['matricula']); ?>" readonly>
+            <input type="text" value="<?php echo htmlspecialchars($club['matricula'] ?? ''); ?>" readonly>
             <br><br>
             <label>Carrera:</label> 
-            <input type="text" value="<?php echo htmlspecialchars($club['carrera']); ?>" readonly>
+            <input type="text" value="<?php echo htmlspecialchars($club['carrera'] ?? ''); ?>" readonly>
             <br><br>
             <label>Semestre actual:</label>
-            <input type="text" id="semestre_actual" name="semestre_actual" value="<?php echo htmlspecialchars($club['semestre_actual']);?>" readonly>
+            <input type="text" id="semestre_actual" name="semestre_actual" value="<?php echo htmlspecialchars($club['semestre_actual'] ?? '');?>" readonly>
             <br> <br>
             <label>Teléfono:</label> 
-            <input type="text" name="telefono" value="<?php echo htmlspecialchars($club['telefono']); ?>" readonly>
+            <input type="text" name="telefono" value="<?php echo htmlspecialchars($club['telefono'] ?? ''); ?>" readonly>
             <br><br>
             <label>Correo:</label>
-            <input type="text" name="correo" value="<?php echo htmlspecialchars($club['correo']);?>" readonly>
+            <input type="text" name="correo" value="<?php echo htmlspecialchars($club['correo'] ?? '');?>" readonly>
             <br><br>
             <label>Club Escolar:</label> 
-            <input type="text" name="club" required value="<?php echo htmlspecialchars($club['nombre_actividad']); ?>">
+            <input type="text" name="club" required value="<?php echo htmlspecialchars($club['nombre_actividad'] ?? ''); ?>">
             <br><br>
             <label>Créditos: </label>
-            <input type="text" id="creditos" name="creditos" value="<?php echo htmlspecialchars($club['creditos']);?>" readonly>
+            <input type="text" id="creditos" name="creditos" value="<?php echo htmlspecialchars($club['creditos'] ?? '');?>" readonly>
             <br> <br>
             <label>Grupo:</label> 
-            <input type="text" value="<?php echo htmlspecialchars($club['nombre_grupo']); ?>" readonly>
+            <input type="text" value="<?php echo htmlspecialchars($club['nombre_grupo'] ?? ''); ?>" readonly>
             <br><br>
             <div class="form-actions">
                 <button type="submit" class="btn-dashboard btn-aceptar">Guardar Cambios</button>

@@ -8,29 +8,24 @@ if(!isset($_SESSION['id_usuario']) || $_SESSION['rol'] != 'alumno'){
 }
 
 $id_usuario = $_SESSION['id_usuario'];
+$mensajes = [];
 
 try {
-    $stmtAl = $pdo->prepare("SELECT id_alumno FROM alumnos WHERE id_usuario = ? LIMIT 1");
-    $stmtAl->execute([$id_usuario]);
-    $alumno = $stmtAl->fetch(PDO::FETCH_ASSOC);
+    $stmt_mensajes = $pdo->prepare("CALL consultar_comentarios(?)");
+    $stmt_mensajes->execute([$id_usuario]);
 
-    if(!$alumno){
-        die("Error: Registro de alumno no encontrado.");
-    }
+    $mensajes = $stmt_mensajes->fetchAll(PDO::FETCH_ASSOC);
+    $stmt_mensajes->closeCursor();
+    
+    $stmt_ss = $pdo->prepare("CALL menu_ss(?)");
+    $stmt_ss->execute([$id_usuario]);
+    $tiene_registro_ss = (int)$stmt_ss->fetchColumn() > 0;
+    $stmt_ss->closeCursor(); 
 
-    $id_alumno = $alumno['id_alumno'];
-    $stmt = $pdo->prepare("
-        SELECT m.asunto, m.mensaje, m.fecha_envio, d.nombre_completo
-        FROM mensajes m
-        INNER JOIN docentes d ON m.id_docente = d.id_docente
-        WHERE m.id_alumno = ?
-        ORDER BY m.fecha_envio DESC
-    ");
-    $stmt->execute([$id_alumno]);
-    $mensajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-} catch(PDOException $e) {
-    die("Error técnico: " . $e->getMessage());
+} catch (PDOException $e) {
+    $error_message = "Error en el sistema: " . $e->getMessage();
+    $mensajes = [];
+    $tiene_registro_ss = false;
 }
 ?>
 

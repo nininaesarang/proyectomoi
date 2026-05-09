@@ -5,6 +5,7 @@ require 'header_alumno.php';
 
 $message = null;
 $error_message = null;
+$tiene_registro_ss = false;
 
 if(isset($_GET['msg'])){
    if( $_GET['msg'] == 'error' && isset($_GET['detail'])){
@@ -12,21 +13,22 @@ if(isset($_GET['msg'])){
    }
 }
 
-try{
-    $sql = "SELECT titulo,
-    tipo,
-    ruta_archivo,
-    fecha_limite
-    FROM
-    aula_virtual_materiales
-    ORDER BY
-    fecha_limite ASC";
-    $stmt = $pdo->query($sql);
-    $tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-catch(PDOException $e){
-    $error_message = "Error al cargar las tareas: " . $e->getMessage();
+try {
+    $id_usuario = $_SESSION['id_usuario'];
+    $stmt_tareas = $pdo->prepare("CALL consultar_tarea()");
+    $stmt_tareas->execute();
+    $tareas = $stmt_tareas->fetchAll(PDO::FETCH_ASSOC);
+    $stmt_tareas->closeCursor();
+    
+    $stmt_ss = $pdo->prepare("CALL menu_ss(?)");
+    $stmt_ss->execute([$id_usuario]);
+    $tiene_registro_ss = (int)$stmt_ss->fetchColumn() > 0;
+    $stmt_ss->closeCursor(); 
+
+} catch (PDOException $e) {
+    $error_message = "Error en el sistema: " . $e->getMessage();
     $tareas = [];
+    $tiene_registro_ss = false;
 }
 ?>
 
@@ -90,7 +92,7 @@ body {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if(count($tareas) > 0): ?>
+                    <?php if(!empty($tareas)): ?>
                         <?php foreach($tareas as $row): ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($row['titulo']); ?></td>
