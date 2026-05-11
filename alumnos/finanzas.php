@@ -15,18 +15,7 @@ if(isset($_GET['msg'])){
 $id_logueado = $_SESSION['id_usuario'];
 
 try{
-    $sql = "SELECT a.matricula,
-    fa.concepto_pago,
-    fa.fecha_vencimiento,
-    fa.pagado,
-    fa.referencia_bancaria,
-    fa.monto
-    FROM
-    alumnos a
-    left join
-    finanzas_adeudos fa on a.id_alumno = fa.id_alumno
-    WHERE a.id_usuario = ?
-    ORDER BY fa.fecha_vencimiento ASC";
+    $sql = "CALL sp_obtener_finanzas_alumno(?)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id_logueado]);
     $todos_pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -35,7 +24,7 @@ try{
     return strtolower(trim($pago['pagado'])) === 'pagado'; 
 });
 
-// Filtramos los pendientes (comparamos contra 'pendiente' en minúsculas)
+
 $pagos_pendientes = array_filter($todos_pagos, function($pago) {
     return strtolower(trim($pago['pagado'])) === 'pendiente';
 });

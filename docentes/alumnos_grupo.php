@@ -2,18 +2,11 @@
 session_start();
 require '../conexion.php';
 
-$sql = "SELECT alumnos.matricula, nombre_completo,
-       usuarios.correo,
-       grupos.nombre_grupo
-FROM alumnos
-JOIN usuarios ON alumnos.id_usuario = usuarios.id_usuario
-JOIN grupos ON alumnos.id_grupo = grupos.id_grupo;";
-
-//Traer datos
-
+$sql = "CALL sp_obtener_lista_alumnos_grupo()";
 $stmt = $pdo->query($sql);
 $alumnos = $stmt->fetchAll();
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>

@@ -3,12 +3,7 @@ if (isset($_SESSION['id_usuario']) && $_SESSION['rol'] == 'alumno') {
     $id_log = $_SESSION['id_usuario'];
 
     try {
-        $sql_ss = "SELECT ss.id_alumno 
-                   FROM servicio_social ss
-                   INNER JOIN alumnos a ON ss.id_alumno = a.id_alumno
-                   WHERE a.id_usuario = ? 
-                   LIMIT 1";
-                   
+        $sql_ss = "CALL sp_verificar_registro_ss_alumno(?)";
         $stmt_ss = $pdo->prepare($sql_ss);
         $stmt_ss->execute([$id_log]);
         $registro_ss = $stmt_ss->fetch();

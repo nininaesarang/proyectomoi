@@ -19,13 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo->beginTransaction();
             
-            $sql1 = "UPDATE usuarios SET correo = ? WHERE id_usuario = ?";
+            $sql1 = "CALL sp_actualizar_datos_contacto(?, ?, ?)";
             $stmt1 = $pdo->prepare($sql1);
-            $stmt1->execute([$nuevo_correo, $id_logueado]);
-
-            $sql2 = "UPDATE alumnos SET telefono = ? WHERE id_usuario = ?";
-            $stmt2 = $pdo->prepare($sql2);
-            $stmt2->execute([$nuevo_telefono, $id_logueado]);
+            $stmt1->execute([$nuevo_correo, $nuevo_telefono, $id_logueado]);
 
             $pdo->commit();
             header("Location: perfil.php?msg=actualizado_exitoso");
@@ -40,12 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 try {
-    $sql_perfil =
-    "SELECT a.*, g.nombre_grupo, u.correo 
-    FROM alumnos a 
-    left JOIN usuarios u ON a.id_usuario = u.id_usuario 
-    left JOIN grupos g ON a.id_grupo = g.id_grupo 
-    WHERE a.id_usuario = ?";
+    $sql_perfil = "CALL sp_obtener_perfil_alumno(?)";
     $stmt_p = $pdo->prepare($sql_perfil);
     $stmt_p->execute([$id_logueado]);
     $perfil = $stmt_p->fetch(PDO::FETCH_ASSOC);

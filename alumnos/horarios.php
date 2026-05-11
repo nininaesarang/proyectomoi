@@ -15,24 +15,7 @@ if(isset($_GET['msg'])){
 $id_logueado = $_SESSION['id_usuario'];
 
 try{
-    $sql = "SELECT g.nombre_grupo,
-    h.dia_semana,
-    h.hora_inicio,
-    h.hora_fin,
-    h.aula,
-    m.nombre_materia,
-    d.nombre_completo,
-    ce.nombre_periodo
-    FROM alumnos a
-    inner join grupos g on a.id_grupo = g.id_grupo
-    inner join carga_academica ca on g.id_grupo = ca.id_grupo
-    inner join horarios h on h.id_carga_academica = ca.id_carga_academica
-    inner join materias m on m.id_materia = ca.id_materia
-    inner join docentes d on d.id_docente = ca.id_docente
-    inner join ciclos_escolares ce on ce.id_ciclo = ca.id_ciclo
-    where a.id_usuario = ?
-    ORDER BY FIELD(h.dia_semana, 'lunes', 'martes', 'miercoles', 'jueves', 'viernes'), h.hora_inicio ASC";
-    
+    $sql = "CALL sp_obtener_horario_detallado_alumno(?)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id_logueado]);
     $horario = $stmt->fetchAll(PDO::FETCH_ASSOC);

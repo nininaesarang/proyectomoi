@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
+if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {sssss
     header("Location: ../../index.php");
     exit;
 }
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (!empty($nombre_periodo)) {
         try {
-            $sql_insert = "INSERT INTO ciclos_escolares (nombre_periodo, activo) VALUES (?, ?)";
+            $sql_insert = "CALL sp_insertar_ciclo(?, ?)";
             $stmt_insert = $pdo->prepare($sql_insert);
             $stmt_insert->execute([$nombre_periodo, $activo]);
             $mensaje = "<div class='message-box success'>¡Ciclo escolar registrado correctamente!</div>";
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 try {
-    $sql = "SELECT * FROM ciclos_escolares ORDER BY id_ciclo DESC";
+    $sql = "CALL sp_obtener_ciclos_activos()";
     $stmt = $pdo->query($sql);
     $ciclos = $stmt->fetchAll();
 } catch (PDOException $e) {

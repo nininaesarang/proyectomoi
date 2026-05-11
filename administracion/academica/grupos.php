@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (!empty($nombre_grupo) && !empty($id_ciclo)) {
         try {
-            $sql_insert = "INSERT INTO grupos (id_ciclo, nombre_grupo) VALUES (?, ?)";
+            $sql_insert = "CALL sp_insertar_grupo(?, ?)";
             $stmt_insert = $pdo->prepare($sql_insert);
             $stmt_insert->execute([$id_ciclo, $nombre_grupo]);
             
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 try {
-    $sql_ciclos = "SELECT * FROM ciclos_escolares ORDER BY id_ciclo DESC";
+    $sql_ciclos = "CALL sp_obtener_ciclos_activos()";
     $stmt_ciclos = $pdo->query($sql_ciclos);
     $ciclos = $stmt_ciclos->fetchAll();
 } catch (PDOException $e) {
@@ -41,10 +41,7 @@ try {
 
 
 try {
-    $sql_grupos = "SELECT g.id_grupo, g.nombre_grupo, c.nombre_periodo 
-                   FROM grupos g 
-                   LEFT JOIN ciclos_escolares c ON g.id_ciclo = c.id_ciclo 
-                   ORDER BY g.id_grupo DESC";
+    $sql_grupos = "CALL sp_obtener_grupos_detalles()";
     $stmt_grupos = $pdo->query($sql_grupos);
     $lista_grupos = $stmt_grupos->fetchAll();
 } catch (PDOException $e) {

@@ -6,34 +6,29 @@ require '../conexion.php';
 
 $materia_id = $_GET['materia'] ?? ($_POST['materia_id'] ?? 1);
 $id_usuario_sesion = $_SESSION['id_usuario'];
-$stmt_doc = $pdo->prepare("SELECT id_docente FROM docentes WHERE id_usuario = ?");
+
+
+$stmt_doc = $pdo->prepare("CALL sp_obtener_id_docente(?)");
 $stmt_doc->execute([$id_usuario_sesion]);
 $docente_data = $stmt_doc->fetch();
 $id_docente = $docente_data['id_docente'] ?? 0;
-$sql_mis_materias = "SELECT ca.id_materia, m.nombre_materia, g.nombre_grupo
-                     FROM carga_academica ca
-                     JOIN materias m ON ca.id_materia = m.id_materia
-                     JOIN grupos g ON ca.id_grupo = g.id_grupo
-                     WHERE ca.id_docente = ?";
+
+
+$sql_mis_materias = "CALL sp_obtener_materias_docente(?)";
 $stmt_m = $pdo->prepare($sql_mis_materias);
 $stmt_m->execute([$id_docente]);
 $mis_materias = $stmt_m->fetchAll(PDO::FETCH_ASSOC);
 $materia_id = $_GET['materia'] ?? null;
 
+
 if (isset($_GET['reabrir'])) {
-    $sql_reabrir = "UPDATE calificaciones_activas
-                    SET acta_cerrada = NULL
-                    WHERE id_alumno IN (
-                        SELECT a.id_alumno
-                        FROM alumnos a
-                        JOIN carga_academica c ON c.id_grupo = a.id_grupo
-                        WHERE c.id_materia = ?
-                    )";
+    $sql_reabrir = "CALL sp_reabrir_actas(?)";
     $stmt_r = $pdo->prepare($sql_reabrir);
     $stmt_r->execute([$materia_id]);
     header("Location: gestion_calificaciones.php?materia=$materia_id&msg=reabierta");
     exit;
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unidad1'])) {
     foreach ($_POST['unidad1'] as $id_alumno => $val) {
@@ -51,33 +46,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unidad1'])) {
         }
         $promedio = $count > 0 ? round($suma / $count, 2) : null;
 
-        // 1. Verificamos si existe y si el acta está cerrada para este alumno específico
-        $stmt_check = $pdo->prepare("SELECT id_alumno, acta_cerrada FROM calificaciones_activas WHERE id_alumno = ? AND id_materia = ?");
+        
+        $stmt_check = $pdo->prepare("CALL sp_verificar_acta_alumno(?, ?)");
         $stmt_check->execute([$id_alumno, $materia_id]);
         $registro_actual = $stmt_check->fetch(PDO::FETCH_ASSOC);
         
         if ($registro_actual) {
-            // ACTUALIZAMOS (solo si no está cerrada)
-            $sql_upd = "UPDATE calificaciones_activas 
-                        SET unidad_1=?, unidad_2=?, unidad_3=?, unidad_4=?, unidad_5=?, unidad_6=?, promedio_final=? 
-                        WHERE id_alumno=? AND id_materia=? AND (acta_cerrada IS NULL OR acta_cerrada != 'si')";
+            
+            $sql_upd = "CALL sp_actualizar_calificaciones(?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql_upd);
             $stmt->execute([$u1, $u2, $u3, $u4, $u5, $u6, $promedio, $id_alumno, $materia_id]);
 
-            // --- AQUÍ VA LA SINCRONIZACIÓN CON EL KARDEX ---
-            // Si el acta ya estaba cerrada, actualizamos el Kardex también para que coincidan
+            
             if ($registro_actual['acta_cerrada'] == 'si') {
-                $sql_sync = "UPDATE kardex 
-                             SET calificacion_definitiva = ?, 
-                                 estatus_aprobacion = CASE WHEN ? >= 70 THEN 'Aprobado' ELSE 'Reprobado' END
-                             WHERE id_alumno = ? AND id_materia = ?";
+                $sql_sync = "CALL sp_sincronizar_kardex(?, ?, ?, ?)";
                 $stmt_s = $pdo->prepare($sql_sync);
                 $stmt_s->execute([$promedio, $promedio, $id_alumno, $materia_id]);
             }
         } else {
-            // INSERTAMOS (si no existe)
-            $sql_ins = "INSERT INTO calificaciones_activas (id_alumno, id_materia, unidad_1, unidad_2, unidad_3, unidad_4, unidad_5, unidad_6, promedio_final) 
-                        VALUES (?,?,?,?,?,?,?,?,?)";
+            
+            $sql_ins = "CALL sp_insertar_calificaciones(?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql_ins);
             $stmt->execute([$id_alumno, $materia_id, $u1, $u2, $u3, $u4, $u5, $u6, $promedio]);
         }
@@ -86,37 +74,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unidad1'])) {
     exit;
 }
 
+
 if (isset($_GET['cerrar'])) {
     try {
         $pdo->beginTransaction();
-        $sql_cerrar = "UPDATE calificaciones_activas
-                       SET acta_cerrada = 'si'
-                       WHERE id_alumno IN (
-                           SELECT a.id_alumno
-                           FROM alumnos a
-                           JOIN carga_academica c ON c.id_grupo = a.id_grupo
-                           WHERE c.id_materia = ?
-                       )";
+        
+        
+        $sql_cerrar = "CALL sp_cerrar_actas(?)";
         $stmt_c = $pdo->prepare($sql_cerrar);
         $stmt_c->execute([$materia_id]);
-        $sql_kardex = "INSERT INTO kardex (id_alumno, id_materia, id_ciclo, calificacion_definitiva, estatus_aprobacion, oportunidad)
-               SELECT
-                   ca.id_alumno,
-                   cac.id_materia,
-                   cac.id_ciclo,
-                   ca.promedio_final,
-                   CASE WHEN ca.promedio_final >= 70 THEN 'Aprobado' ELSE 'Reprobado' END,
-                   'Ordinario'
-               FROM calificaciones_activas ca
-               JOIN alumnos a ON ca.id_alumno = a.id_alumno
-               JOIN carga_academica cac ON a.id_grupo = cac.id_grupo
-               WHERE cac.id_materia = ?
-               AND ca.promedio_final IS NOT NULL
-               ON DUPLICATE KEY UPDATE
-                   calificacion_definitiva = VALUES(calificacion_definitiva),
-                   estatus_aprobacion = VALUES(estatus_aprobacion)";
+        
+        
+        $sql_kardex = "CALL sp_insertar_kardex_cierre(?)";
         $stmt_k = $pdo->prepare($sql_kardex);
         $stmt_k->execute([$materia_id]);
+        
         $pdo->commit();
         header("Location: gestion_calificaciones.php?materia=$materia_id&msg=cerrada_y_kardex");
 
@@ -127,23 +99,27 @@ if (isset($_GET['cerrar'])) {
     exit;
 }
 
+
 if (isset($_GET['solicitar'])) {
     $id_usuario = $_SESSION['id_usuario'];
-    $stmt_doc = $pdo->prepare("SELECT id_docente, nombre_completo FROM docentes WHERE id_usuario = ?");
+    
+    
+    $stmt_doc = $pdo->prepare("CALL sp_obtener_docente_por_usuario(?)");
     $stmt_doc->execute([$id_usuario]);
     $docente = $stmt_doc->fetch(PDO::FETCH_ASSOC);
+    
     if ($docente) {
-        $stmt_admins = $pdo->prepare("SELECT id_usuario FROM usuarios WHERE rol = 'administrativo'");
+        
+        $stmt_admins = $pdo->prepare("CALL sp_obtener_admins()");
         $stmt_admins->execute();
         $admins = $stmt_admins->fetchAll(PDO::FETCH_ASSOC);
+        
         $asunto = "Solicitud para reabrir la acta";
         $mensaje = "El docente " . $docente['nombre_completo'] . " está solicitando abrir las actas para modificación.";
+        
         foreach ($admins as $admin) {
-            $stmt_insert = $pdo->prepare("
-                INSERT INTO mensajes_admin (id_docente, id_admin, asunto, mensaje)
-                VALUES (?, ?, ?, ?)
-            ");
-
+            
+            $stmt_insert = $pdo->prepare("CALL sp_insertar_mensaje_admin(?, ?, ?, ?)");
             $stmt_insert->execute([
                 $docente['id_docente'],
                 $admin['id_usuario'],
@@ -156,14 +132,8 @@ if (isset($_GET['solicitar'])) {
     exit;
 }
 
-$sql = "SELECT a.id_alumno, a.matricula, a.carrera,
-               ca.unidad_1, ca.unidad_2, ca.unidad_3, ca.unidad_4, ca.unidad_5, ca.unidad_6,
-               ca.promedio_final, ca.acta_cerrada, ca.id_materia
-        FROM alumnos a
-        JOIN carga_academica c ON c.id_grupo = a.id_grupo
-        LEFT JOIN calificaciones_activas ca ON ca.id_alumno = a.id_alumno AND ca.id_materia = ?
-        WHERE c.id_materia = ?
-        ORDER BY a.matricula ASC";
+
+$sql = "CALL sp_obtener_calificaciones_alumnos(?, ?)";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$materia_id, $materia_id]);
 $alumnos = $stmt->fetchAll(PDO::FETCH_ASSOC);

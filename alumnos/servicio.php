@@ -12,19 +12,7 @@ if(isset($_GET['msg'])){
 }
 
 try{
-    $sql = "SELECT a.*,
-    u.correo,
-    ss.horas_liberadas,
-    ss.ruta_carta_aceptacion,
-    ss.ruta_carta_liberacion,
-    ss.ruta_reporte1,
-    ss.ruta_reporte2,
-    ss.ruta_reporte3
-    FROM
-    alumnos a
-    inner join usuarios u on a.id_usuario = u.id_usuario
-    left join servicio_social ss on a.id_alumno = ss.id_alumno
-    where a.id_usuario = ?";
+    $sql = "CALL sp_obtener_servicio_social_alumno(?)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id_logueado]);
     $servicio = $stmt->fetch(PDO::FETCH_ASSOC);

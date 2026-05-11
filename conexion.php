@@ -2,7 +2,7 @@
 $host = 'localhost';
 $dbname = 'escolar';
 $username = 'root';
-$password_db = 'tu_password';
+$password_db = '';
 $port = '3306';
 
 try {

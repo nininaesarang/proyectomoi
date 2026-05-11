@@ -13,14 +13,7 @@ if(isset($_GET['msg'])){
 }
 
 try{
-    $sql = "SELECT titulo,
-    tipo,
-    ruta_archivo,
-    fecha_limite
-    FROM
-    aula_virtual_materiales
-    ORDER BY
-    fecha_limite ASC";
+    $sql = "CALL sp_obtener_tareas_aula_virtual()";
     $stmt = $pdo->query($sql);
     $tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

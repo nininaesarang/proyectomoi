@@ -22,8 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!empty($id_docente) && !empty($id_materia) && !empty($id_grupo) && !empty($id_ciclo)) {
             try {
                 
-                $sql_insert = "INSERT INTO carga_academica (id_docente, id_materia, id_grupo, id_ciclo, acta_abierta) 
-                               VALUES (?, ?, ?, ?, 1)";
+                $sql_insert = "CALL sp_asignar_carga_academica(?, ?, ?, ?)";
                 $stmt_insert = $pdo->prepare($sql_insert);
                 $stmt_insert->execute([$id_docente, $id_materia, $id_grupo, $id_ciclo]);
                 
@@ -42,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $nuevo_estado = $_POST['nuevo_estado']; 
         
         try {
-            $sql_toggle = "UPDATE carga_academica SET acta_abierta = ? WHERE id_carga_academica = ?";
+            $sql_toggle = "CALL sp_toggle_estado_acta(?, ?)";
             $stmt_toggle = $pdo->prepare($sql_toggle);
             $stmt_toggle->execute([$nuevo_estado, $id_carga]);
             
@@ -57,23 +56,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 
-$docentes = $pdo->query("SELECT id_docente, nombre_completo FROM docentes WHERE estatus = 'Activo'")->fetchAll();
-$materias = $pdo->query("SELECT id_materia, nombre_materia FROM materias")->fetchAll();
-$grupos = $pdo->query("SELECT id_grupo, nombre_grupo FROM grupos")->fetchAll();
-$ciclos = $pdo->query("SELECT id_ciclo, nombre_periodo FROM ciclos_escolares WHERE activo = 'Sí'")->fetchAll();
+$docentes = $pdo->query("CALL sp_obtener_docentes_activos()")->fetchAll();
+$materias = $pdo->query("CALL sp_obtener_materias_simples()")->fetchAll();
+$grupos   = $pdo->query("CALL sp_obtener_grupos_simples()")->fetchAll();
+$ciclos   = $pdo->query("CALL sp_obtener_ciclos_activos()")->fetchAll();
 
 
 
 
 try {
     
-    $sql_cargas = "SELECT ca.id_carga_academica, ca.acta_abierta, d.nombre_completo, m.nombre_materia, g.nombre_grupo, c.nombre_periodo 
-                   FROM carga_academica ca
-                   INNER JOIN docentes d ON ca.id_docente = d.id_docente
-                   INNER JOIN materias m ON ca.id_materia = m.id_materia
-                   INNER JOIN grupos g ON ca.id_grupo = g.id_grupo
-                   INNER JOIN ciclos_escolares c ON ca.id_ciclo = c.id_ciclo
-                   ORDER BY ca.id_carga_academica DESC";
+    $sql_cargas = "CALL sp_obtener_cargas_academicas_detalle()";
     $cargas = $pdo->query($sql_cargas)->fetchAll();
 } catch (PDOException $e) {
     echo "Error al cargar las asignaciones: " . $e->getMessage();

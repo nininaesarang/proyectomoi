@@ -4,76 +4,38 @@ require '../conexion.php';
 
 $id_usuario = $_SESSION['id_usuario'];
 
-$sql_docente = "SELECT id_docente FROM docentes WHERE id_usuario = ?";
-$stmt = $pdo->prepare($sql_docente);
+$stmt = $pdo->prepare("CALL sp_obtener_id_docente(?)");
 $stmt->execute([$id_usuario]);
-
-//se trae
 $docente = $stmt->fetch();
 $id_docente = $docente['id_docente'] ?? 0;
 
-// Alumnitos
-$sql_alumnos = "SELECT alumnos.id_alumno,
-       alumnos.matricula, nombre_completo,
-       alumnos.semestre_actual
-FROM alumnos
-JOIN usuarios ON usuarios.id_usuario = alumnos.id_usuario
-JOIN carga_academica ON carga_academica.id_grupo = alumnos.id_grupo
-WHERE carga_academica.id_docente = ?
-ORDER BY alumnos.semestre_actual, alumnos.matricula";
-
-$stmt = $pdo->prepare($sql_alumnos);
+$stmt = $pdo->prepare("CALL sp_obtener_alumnos_por_docente(?)");
 $stmt->execute([$id_docente]);
 $alumnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//mandar la asistencia
- //hacer clic
+
 if(isset($_POST['guardar_asistencia'])){
-    //assitencitas por dia
+
     foreach($_POST['asistencia'] as $id_alumno => $estatus){
         $fecha = date('Y-m-d H:i:s');
 
-       // guardar en tablita
-        $sql_insert = "INSERT INTO asistencias (id_alumno, id_carga_academica, fecha, estatus)
-                       VALUES (?, ?, ?, ?)";
-        $stmt = $pdo->prepare($sql_insert);
-
-        //ejecutanos
+       
+        $stmt = $pdo->prepare("CALL sp_registrar_asistencia(?, ?, ?, ?)");
         $stmt->execute([$id_alumno, $_POST['id_carga_academica'], $fecha, $estatus]);
     }
 
-    //se guardo bien y todo
+    
     echo "<p style='color:green'>Asistencias registradas correctamente.</p>";
 }
 
-// Traer carga academicaa
-$sql_carga = "SELECT * FROM carga_academica WHERE id_docente = ? LIMIT 1";
 
-//conusultita
-$stmt = $pdo->prepare($sql_carga);
-//id del prof que se logeo
+$stmt = $pdo->prepare("CALL sp_obtener_carga_academica_docente(?)");
 $stmt->execute([$id_docente]);
 $carga = $stmt->fetch();
-//guardar
 $id_carga = $carga['id_carga_academica'] ?? 0;
 
-// aistencia
 
-//contamos segun a lo q le demos clic
-$sql_historial = "
-SELECT id_alumno,
-
-
-       SUM(CASE WHEN estatus='Faltó' THEN 1 ELSE 0 END) AS faltas,
-       SUM(CASE WHEN estatus='Retardo' THEN 1 ELSE 0 END) AS retardos,
-       COUNT(*) AS total
-FROM asistencias
-WHERE id_carga_academica = ?
-GROUP BY id_alumno
-";
-
-//preparamos y ejectams
-$stmt = $pdo->prepare($sql_historial);
+$stmt = $pdo->prepare("CALL sp_obtener_resumen_asistencias(?)");
 $stmt->execute([$id_carga]);
 $historial = [];
 while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
@@ -82,7 +44,7 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
     $porcentaje = $total > 0 ? round((($total - $faltas)/$total)*100,2) : 100;
     $estado = $porcentaje < 70 ? "En riesgo" : "Normal";
 
-    //guarda aui
+    
     $historial[$row['id_alumno']] = [
         'faltas' => $faltas,
         'retardos' => $row['retardos'],
@@ -91,6 +53,7 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
     ];
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

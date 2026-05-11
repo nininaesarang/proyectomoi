@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (!empty($nombre_materia) && !empty($creditos)) {
         try {
-            $sql_insert = "INSERT INTO materias (nombre_materia, creditos) VALUES (?, ?)";
+            $sql_insert = "CALL sp_insertar_materia(?, ?)";
             $stmt_insert = $pdo->prepare($sql_insert);
             $stmt_insert->execute([$nombre_materia, $creditos]);
             
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 try {
-    $sql_materias = "SELECT * FROM materias ORDER BY id_materia DESC";
+    $sql_materias = "CALL sp_obtener_lista_materias()";
     $stmt_materias = $pdo->query($sql_materias);
     $lista_materias = $stmt_materias->fetchAll();
 } catch (PDOException $e) {

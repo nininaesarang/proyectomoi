@@ -21,8 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         try {
 
-            $sql = "INSERT INTO aspirantes (nombre_completo, ficha_referencia, pago_ficha_realizada, docs_entregados, pago_inscripcion_realizado, aceptado) 
-                    VALUES (?, ?, 0, 0, 0, 0)";
+            $sql = "CALL sp_insertar_aspirante(?, ?)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$nombre, $referencia]);
 

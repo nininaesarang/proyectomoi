@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Validación de rol administrativo
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
     header("Location: ../../index.php");
     exit;
@@ -9,7 +9,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
 include '../conexion.php';
 $mensaje = '';
 
-// 1. PROCESAR EL INSERT (Cuando el admin da clic en Guardar)
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['crear_horario'])) {
     $id_carga = $_POST['id_carga_academica'];
     $dia = $_POST['dia_semana'];
@@ -18,8 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['crear_horario'])) {
     $aula = $_POST['aula'];
 
     try {
-        $sql = "INSERT INTO horarios (id_carga_academica, dia_semana, hora_inicio, hora_fin, aula) 
-                VALUES (?, ?, ?, ?, ?)";
+        $sql = "CALL sp_insertar_horario(?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$id_carga, $dia, $inicio, $fin, $aula]);
         $mensaje = "<div class='message-box success'>¡Horario asignado con éxito!</div>";
@@ -28,20 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['crear_horario'])) {
     }
 }
 
-// 2. CONSULTAS PARA EL FORMULARIO
-// Traemos las materias con sus grupos para que el admin sepa a cuál asignar
-$clases = $pdo->query("SELECT ca.id_carga_academica, m.nombre_materia, g.nombre_grupo 
-                       FROM carga_academica ca 
-                       JOIN materias m ON ca.id_materia = m.id_materia 
-                       JOIN grupos g ON ca.id_grupo = g.id_grupo")->fetchAll();
 
-// Traemos los horarios ya existentes para mostrarlos abajo
-$horarios_actuales = $pdo->query("SELECT h.*, m.nombre_materia, g.nombre_grupo 
-                                  FROM horarios h 
-                                  JOIN carga_academica ca ON h.id_carga_academica = ca.id_carga_academica 
-                                  JOIN materias m ON ca.id_materia = m.id_materia 
-                                  JOIN grupos g ON ca.id_grupo = g.id_grupo 
-                                  ORDER BY h.id_horario DESC")->fetchAll();
+$clases = $pdo->query("CALL sp_obtener_clases_horarios()")->fetchAll();
+
+
+$horarios_actuales = $pdo->query("CALL sp_obtener_horarios_actuales()")->fetchAll();
 ?>
 
 <!DOCTYPE html>

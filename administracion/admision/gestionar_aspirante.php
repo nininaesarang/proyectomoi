@@ -17,10 +17,11 @@ if (!$id_aspirante) {
 }
 
 
-$sql_actual = "SELECT * FROM aspirantes WHERE id_aspirante = ?";
+$sql_actual = "CALL sp_obtener_aspirante_por_id(?)";
 $stmt_actual = $pdo->prepare($sql_actual);
 $stmt_actual->execute([$id_aspirante]);
 $aspirante = $stmt_actual->fetch();
+$stmt_actual->closeCursor();
 
 if (!$aspirante) {
     echo "Aspirante no encontrado.";
@@ -36,38 +37,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $aceptado = $_POST['aceptado'] ?? '0';
 
     try {
-        $sql_update = "UPDATE aspirantes SET 
-                pago_ficha_realizada = ?, 
-                calificacion_examen = ?, 
-                docs_entregados = ?, 
-                pago_inscripcion_realizado = ?, 
-                aceptado = ? 
-                WHERE id_aspirante = ?";
+       
+        $sql_update = "CALL sp_actualizar_datos_aspirante(?, ?, ?, ?, ?, ?)";
         $stmt_update = $pdo->prepare($sql_update);
-
-        $stmt_update->execute([$pago_ficha, $calificacion, $docs, $pago_insc, $aceptado, $id_aspirante]);
+        $stmt_update->execute([$id_aspirante,$pago_ficha, $calificacion, $docs, $pago_insc, $aceptado]);
+        $stmt_update->closeCursor();
         
         $mensaje = "<div class='message-box success'>¡Datos de admisión actualizados correctamente!</div>";
 
-
-        
         if ($aceptado == '1' && $aspirante['aceptado'] != '1') {
             
             $matricula_nueva = date("y") . rand(1000, 9999);
             $correo_nuevo = "A" . $matricula_nueva . "@tecsanpedro.edu.mx";
             $password_nueva = "12345678";
 
-
-            $sql_user = "INSERT INTO usuarios (correo, password, rol) VALUES (?, ?, 'alumno')";
+            
+            $sql_user = "CALL sp_crear_usuario_alumno(?, ?)";
             $stmt_user = $pdo->prepare($sql_user);
             $stmt_user->execute([$correo_nuevo, $password_nueva]);
-            $id_usuario_nuevo = $pdo->lastInsertId();
+            $resultado_user = $stmt_user->fetch();
+            $id_usuario_nuevo = $resultado_user['nuevo_id'];
+            $stmt_user->closeCursor();
 
-     
-            $sql_alumno = "INSERT INTO alumnos (id_usuario, matricula, nombre_completo, carrera, semestre_actual, estatus, creditos) 
-                           VALUES (?, ?, ?, 'Ingeniería en Sistemas', 1, 'Activo', 0)";
+            
+            $sql_alumno = "CALL sp_crear_perfil_alumno(?, ?, ?)";
             $stmt_alumno = $pdo->prepare($sql_alumno);
-
             $stmt_alumno->execute([$id_usuario_nuevo, $matricula_nueva, $aspirante['nombre_completo']]);
 
             $mensaje .= "<div class='message-box' style='margin-top:10px; border:1px solid #007bff; background-color:#cce5ff; color:#004085; text-align:center;'>
@@ -79,9 +73,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                          </div>";
         }
 
-
+        
         $stmt_actual->execute([$id_aspirante]);
         $aspirante = $stmt_actual->fetch();
+        $stmt_actual->closeCursor();
 
     } catch (PDOException $e) {
         $mensaje = "<div class='message-box error'>Error al actualizar: " . $e->getMessage() . "</div>";

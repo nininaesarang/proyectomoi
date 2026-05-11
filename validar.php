@@ -8,15 +8,16 @@ $intento_rol = $_POST['rol'] ?? 'alumno';
 
 if ($correo && $password) {
 
-    $sql = "SELECT id_usuario, password, rol FROM usuarios WHERE correo = ?";
+    
+    $sql = "CALL sp_obtener_usuario_login(?, ?)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$correo]);
+    $stmt->execute([$correo, $password]);
     $usuario = $stmt->fetch();
 
-    if($usuario && $password === $usuario['password']){
+
+    if($usuario){
         if ($usuario['rol'] === $intento_rol) {
-        
-        $password_bd = $usuario['password'];
+    
         $_SESSION['id_usuario'] = $usuario['id_usuario'];
         $_SESSION['rol'] = $usuario['rol'];
 

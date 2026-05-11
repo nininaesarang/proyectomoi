@@ -4,25 +4,18 @@ require '../conexion.php';
 
 $id_usuario = $_SESSION['id_usuario'];
 
-/* que usuario es el docente*/ 
-$sql_docente = "SELECT id_docente FROM docentes WHERE id_usuario = ?";
-$stmt = $pdo->prepare($sql_docente);
+$stmt = $pdo->prepare("CALL sp_obtener_id_docente(?)");
 $stmt->execute([$id_usuario]);
 $docente = $stmt->fetch();
+$stmt->closeCursor();
 
 $id_docente = $docente['id_docente'];
 
-$sql = "SELECT materias.nombre_materia, grupos.nombre_grupo, ciclos_escolares.nombre_periodo
-FROM carga_academica
-JOIN materias ON carga_academica.id_materia = materias.id_materia
-JOIN grupos ON carga_academica.id_grupo = grupos.id_grupo
-JOIN ciclos_escolares ON carga_academica.id_ciclo = ciclos_escolares.id_ciclo
-WHERE carga_academica.id_docente = ?";
-
-$stmt = $pdo->prepare($sql);
+$stmt = $pdo->prepare("CALL sp_obtener_grupos_docente_detalle(?)");
 $stmt->execute([$id_docente]);
 $resultado = $stmt->fetchAll();
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -32,7 +25,7 @@ $resultado = $stmt->fetchAll();
     <link rel="stylesheet" href="../style.css">
 </head>
 
-<!-- Diseñito -->
+
 <style>
 h3, h1 {text-align: center;}
 img {width: 100px;}

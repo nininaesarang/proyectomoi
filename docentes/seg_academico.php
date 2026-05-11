@@ -2,16 +2,17 @@
 session_start();
 require '../conexion.php';
 
-//q el uuario si inicio sesion
+
 if(!isset($_SESSION['id_usuario'])){
     die("Error: Debes iniciar sesión primero");
 }
 
 $id_usuario = $_SESSION['id_usuario']; 
 
-$stmtDoc = $pdo->prepare("SELECT id_docente FROM docentes WHERE id_usuario = ?");
+$stmtDoc = $pdo->prepare("CALL sp_obtener_id_docente(?)");
 $stmtDoc->execute([$id_usuario]);
 $docente = $stmtDoc->fetch(PDO::FETCH_ASSOC);
+$stmtDoc->closeCursor();
 
 if(!$docente){
     die("Error: Este usuario no está registrado como docente");
@@ -19,38 +20,24 @@ if(!$docente){
 
 $id_docente = $docente['id_docente'];
 
-//Guardar observaciones
+
 if(isset($_POST['guardar_observacion'])){
-    // ... tu código actual
+    
 }
 
-//Enviar mendajito
+
 if(isset($_POST['enviar_mensaje'])){
     $id_alumno = $_POST['id_alumno'];
     $asunto = $_POST['asunto'];
     $mensaje = $_POST['mensaje'];
 
-    $stmt = $pdo->prepare("INSERT INTO mensajes (id_docente, id_alumno, asunto, mensaje) VALUES (?,?,?,?)");
+    $stmt = $pdo->prepare("CALL sp_enviar_mensaje_alumno(?, ?, ?, ?)");
     $stmt->execute([$id_docente, $id_alumno, $asunto, $mensaje]);
 
     echo "<p style='color:green;'>Mensaje enviado al alumno</p>";
 }
 
-//Consultita
-$sql = "SELECT 
-    alumnos.id_alumno,alumnos.matricula,alumnos.carrera,calificaciones_activas.promedio_final,
-    seguimiento_academico.obersevaciones,
-    seguimiento_academico.nivel_riesgo,
-    alumnos.nombre_completo,
-    usuarios.correo
-FROM alumnos
-LEFT JOIN calificaciones_activas ON calificaciones_activas.id_alumno = alumnos.id_alumno
-LEFT JOIN seguimiento_academico 
-    ON seguimiento_academico.id_alumno = alumnos.id_alumno
-    AND seguimiento_academico.id_docente = ?
-LEFT JOIN usuarios ON usuarios.id_usuario = alumnos.id_usuario
-ORDER BY alumnos.matricula";
-
+$sql = "CALL sp_obtener_seguimiento_academico_docente(?)";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$id_docente]);
 $alumnos = $stmt->fetchAll(PDO::FETCH_ASSOC);

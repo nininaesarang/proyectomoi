@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $fecha_limite = $_POST['fecha_limite'];
 
         try {
-            $sql = "INSERT INTO finanzas_adeudos (id_alumno, concepto_pago, monto, fecha_vencimiento, pagado, referencia_bancaria) VALUES (?, ?, ?, ?, 'Pendiente')";
+            $sql = "CALL sp_crear_cobro_alumno(?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$id_alumno, $concepto, $monto, $fecha_limite]);
             $mensaje = "<div class='message-box success'>¡Cobro de $concepto asignado correctamente al alumno!</div>";
@@ -32,8 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['accion']) && $_POST['accion'] == 'pagar') {
         $id_pago = $_POST['id_pago'];
         try {
-            // Actualizamos el estatus y guardamos la fecha y hora exacta del pago
-            $sql = "UPDATE finanzas_adeudos SET pagado = 'Pagado', fecha_pago = NOW() WHERE id_adeudo = ?";
+            $sql = "CALL sp_procesar_pago_realizado(?)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$id_pago]);
             $mensaje = "<div class='message-box success'>¡El pago se ha registrado exitosamente!</div>";
@@ -46,13 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 
-$alumnos = $pdo->query("SELECT id_alumno, matricula, nombre_completo FROM alumnos WHERE estatus = 'Activo' ORDER BY nombre_completo")->fetchAll();
+$alumnos = $pdo->query("CALL sp_obtener_alumnos_activos()")->fetchAll();
 
 
-$sql_pagos = "SELECT p.*, a.matricula, a.nombre_completo 
-              FROM finanzas_adeudos p 
-              INNER JOIN alumnos a ON p.id_alumno = a.id_alumno 
-              ORDER BY p.pagado DESC, p.fecha_vencimiento ASC";
+$sql_pagos = "CALL sp_obtener_estado_cuenta_general()";
 $lista_pagos = $pdo->query($sql_pagos)->fetchAll();
 ?>
 

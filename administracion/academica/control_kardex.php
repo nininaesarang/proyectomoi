@@ -8,7 +8,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrativo') {
 include '../../conexion.php';
 
 try {
-    $sql = "SELECT id_alumno, matricula, nombre_completo, semestre_actual FROM alumnos ORDER BY semestre_actual ASC";
+    $sql = "CALL sp_obtener_alumnos_kardex()";
     $stmt = $pdo->query($sql);
     $alumnos = $stmt->fetchAll();
 } catch (PDOException $e) {

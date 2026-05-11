@@ -7,20 +7,23 @@ $target_dir = "../uploads/";
 
 if(isset($_POST["submit"])) {
 
-    $mapa_columnas = [
-        'aceptacion' => 'ruta_carta_aceptacion',
-        'liberacion' => 'ruta_carta_liberacion',
-        'reporte1'   => 'ruta_reporte1',
-        'reporte2'   => 'ruta_reporte2',
-        'reporte3'   => 'ruta_reporte3'
-    ];
+    
+    $tipos_validos = ['aceptacion', 'liberacion', 'reporte1', 'reporte2', 'reporte3'];
     $tipo = $_POST['tipo_documento'];
     $uploadOk = 1;
-    $columna = $mapa_columnas[$tipo] ?? null;
     
-    $stmt_id = $pdo->prepare("SELECT id_alumno, matricula FROM alumnos WHERE id_usuario = ?");
+    if (!in_array($tipo, $tipos_validos)) {
+        die("Error: Tipo de documento no válido.");
+    }
+    
+    
+    $stmt_id = $pdo->prepare("CALL sp_obtener_id_matricula_alumno(?)");
     $stmt_id->execute([$id_logueado]);
     $alumno = $stmt_id->fetch();
+    
+    
+    $stmt_id->closeCursor();
+
     $id_alumno = $alumno['id_alumno'];
     $matricula = $alumno['matricula'];
 
@@ -42,11 +45,12 @@ if(isset($_POST["submit"])) {
         if (move_uploaded_file($_FILES["fileUpload"]["tmp_name"], $target_file)) {
             
             try {
-                $sql = "UPDATE servicio_social SET $columna = ? WHERE id_alumno = ?";
+                $sql = "CALL sp_actualizar_documento_servicio(?, ?, ?)";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$target_file, $id_alumno]);
+                $stmt->execute([$id_alumno, $tipo, $target_file]);
                 
                 header("Location: servicio.php?msg=subida_exitosa");
+                exit;
             } catch(PDOException $e) {
                 echo "Error en BD: " . $e->getMessage();
             }

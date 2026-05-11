@@ -10,7 +10,7 @@ include '../../conexion.php';
 
 
 try {
-    $sql = "SELECT * FROM aspirantes ORDER BY id_aspirante DESC";
+    $sql = "CALL sp_obtener_lista_aspirantes()";
     $stmt = $pdo->query($sql);
     $aspirantes = $stmt->fetchAll();
 } catch (PDOException $e) {

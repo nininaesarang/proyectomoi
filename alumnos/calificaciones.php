@@ -15,42 +15,13 @@ if(isset($_GET['msg'])){
 $id_logueado = $_SESSION['id_usuario'];
 
 try{
-    $sql = "SELECT g.nombre_grupo,
-    m.nombre_materia,
-    d.nombre_completo,
-    cal.unidad_1,
-    cal.unidad_2,
-    cal.unidad_3, 
-    cal.unidad_4,
-    cal.unidad_5,
-    cal.unidad_6, 
-    cal.promedio_final,
-    ce.nombre_periodo
-    FROM alumnos a
-    inner join grupos g on a.id_grupo = g.id_grupo
-    inner join carga_academica ca on g.id_grupo = ca.id_grupo
-    inner join materias m on m.id_materia = ca.id_materia
-    inner join docentes d on d.id_docente = ca.id_docente
-    inner join ciclos_escolares ce on ce.id_ciclo = ca.id_ciclo
-    left join calificaciones_activas cal ON cal.id_alumno = a.id_alumno
-    AND cal.id_materia = m.id_materia
-    where a.id_usuario = ?
-    ORDER BY m.nombre_materia ASC";
-    
+
+    $sql = "CALL sp_obtener_calificaciones_activas_alumno(?)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id_logueado]);
     $calif = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $sql_kardex = "SELECT k.calificacion_definitiva,
-    k.estatus_aprobacion, k.oportunidad, 
-    m.nombre_materia, ce.nombre_periodo
-    FROM alumnos a
-    inner join kardex k on k.id_alumno = a.id_alumno
-    inner join materias m on k.id_materia = m.id_materia
-    inner join ciclos_escolares ce on ce.id_ciclo = k.id_ciclo
-    where a.id_usuario = ?
-    ORDER BY ce.id_ciclo DESC, m.nombre_materia ASC";
-                   
+    $sql_kardex = "CALL sp_obtener_kardex_alumno_usuario(?)";
     $stmt_k = $pdo->prepare($sql_kardex);
     $stmt_k->execute([$id_logueado]);
     $kardex_data = $stmt_k->fetchAll(PDO::FETCH_ASSOC);

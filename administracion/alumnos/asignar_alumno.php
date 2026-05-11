@@ -23,9 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $estatus = $_POST['estatus'] ?? 'Activo';
 
     try {
-        $sql_upd = "UPDATE alumnos SET id_grupo = ?, semestre_actual = ?, estatus = ? WHERE id_alumno = ?";
+        $sql_upd = "CALL sp_actualizar_alumno_grupo(?, ?, ?, ?)";
         $stmt_upd = $pdo->prepare($sql_upd);
-        $stmt_upd->execute([$id_grupo, $semestre, $estatus, $id_alumno]);
+        $stmt_upd->execute([$id_alumno, $id_grupo, $semestre, $estatus]);
+        $stmt_upd->closeCursor();
         $mensaje = "<div class='message-box success'>¡Datos del alumno actualizados correctamente!</div>";
     } catch (PDOException $e) {
         $mensaje = "<div class='message-box error'>Error al actualizar: " . $e->getMessage() . "</div>";
@@ -33,10 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 
-$sql_alum = "SELECT * FROM alumnos WHERE id_alumno = ?";
+$sql_alum = "CALL sp_obtener_alumno_por_id(?)";
 $stmt_alum = $pdo->prepare($sql_alum);
 $stmt_alum->execute([$id_alumno]);
 $alumno = $stmt_alum->fetch();
+$stmt_alum->closeCursor();
 
 if (!$alumno) {
     echo "Alumno no encontrado.";
@@ -44,7 +46,7 @@ if (!$alumno) {
 }
 
 
-$sql_grupos = "SELECT * FROM grupos";
+$sql_grupos = "CALL sp_obtener_grupos_lista()";
 $stmt_grupos = $pdo->query($sql_grupos);
 $grupos = $stmt_grupos->fetchAll();
 ?>

@@ -23,17 +23,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
           
             $password_temporal = "profe123"; 
-            $sql_user = "INSERT INTO usuarios (correo, password, rol) VALUES (?, ?, 'docente')";
+            $sql_user = "CALL sp_crear_usuario_docente(?, ?)";
             $stmt_user = $pdo->prepare($sql_user);
             $stmt_user->execute([$correo, $password_temporal]);
+            $resultado = $stmt_user->fetch(PDO::FETCH_ASSOC);
+            $id_usuario_nuevo = $resultado['nuevo_id'];
+            $stmt_user->closeCursor();
             
            
             $id_usuario_nuevo = $pdo->lastInsertId();
 
            
-            $sql_docente = "INSERT INTO docentes (id_usuario, nombre_completo, estatus) VALUES (?, ?, ?)";
+            $sql_docente = "CALL sp_crear_perfil_docente(?, ?, ?)";
             $stmt_docente = $pdo->prepare($sql_docente);
             $stmt_docente->execute([$id_usuario_nuevo, $nombre_completo, $estatus]);
+            $stmt_docente->closeCursor();
 
           
             $pdo->commit();
@@ -55,10 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 try {
-    $sql_docentes = "SELECT d.id_docente, d.nombre_completo, d.estatus, u.correo 
-                     FROM docentes d 
-                     INNER JOIN usuarios u ON d.id_usuario = u.id_usuario 
-                     ORDER BY d.id_docente DESC";
+    $sql_docentes = "CALL sp_obtener_lista_docentes()";
     $stmt_docentes = $pdo->query($sql_docentes);
     $lista_docentes = $stmt_docentes->fetchAll();
 } catch (PDOException $e) {

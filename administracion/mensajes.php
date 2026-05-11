@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['atender_mensaje'])) {
     $id_mensaje = $_POST['id_mensaje'];
     try {
        
-        $sql_update = "UPDATE mensajes_admin SET leido = 1 WHERE id_mensaje = ?";
+        $sql_update = "CALL sp_marcar_mensaje_atendido(?)";
         $stmt_update = $pdo->prepare($sql_update);
         $stmt_update->execute([$id_mensaje]);
         $mensaje_alerta = "<div class='message-box success' style='text-align:center;'>¡Mensaje marcado como atendido y ocultado!</div>";
@@ -24,13 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['atender_mensaje'])) {
 }
 
 
-$stmt = $pdo->prepare("
-    SELECT ma.id_mensaje, ma.asunto, ma.mensaje, ma.fecha_envio, d.nombre_completo
-    FROM mensajes_admin ma
-    INNER JOIN docentes d ON ma.id_docente = d.id_docente
-    WHERE ma.id_admin = ? AND ma.leido = 0
-    ORDER BY ma.fecha_envio DESC
-");
+$stmt = $pdo->prepare("CALL sp_obtener_mensajes_pendientes(?)");
 $stmt->execute([$id_admin]);
 $mensajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>

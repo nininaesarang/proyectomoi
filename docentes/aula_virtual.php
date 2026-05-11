@@ -2,45 +2,45 @@
 session_start();
 require '../conexion.php';
 
-// id de quien iniicio esion
+
 $id_usuario = $_SESSION['id_usuario'];
 
- // buscar docentito consultita
-$stmtDocente = $pdo->prepare("SELECT id_docente FROM docentes WHERE id_usuario = ?");
+
+$stmtDocente = $pdo->prepare("CALL sp_obtener_id_docente(?)");
 $stmtDocente->execute([$id_usuario]);
 $docente = $stmtDocente->fetch(PDO::FETCH_ASSOC);
+$stmtDocente->closeCursor();
 
-//si no hay
+
 if(!$docente) {
     die("<p style='color:red;'>No se encontró el docente</p>");
 }
 
 $id_docente = $docente['id_docente'];
 
-// subir tareita 
+
+$stmtCarga = $pdo->prepare("CALL sp_obtener_carga_academica_docente(?)");
+$stmtCarga->execute([$id_docente]);
+$carga = $stmtCarga->fetch(PDO::FETCH_ASSOC);
+$stmtCarga->closeCursor();
+
+$id_carga_academica = $carga['id_carga_academica'] ?? 0;
+
+
 if(isset($_POST['subir'])) {
     $titulo = $_POST['titulo'];
     $tipo = $_POST['tipo'];
     $fecha_limite = $_POST['fecha_limite'];
     
-    // guardamos lo q subimos
+    
     if(isset($_FILES['archivo']) && $_FILES['archivo']['error'] == 0) {
         $nombreArchivo = time() . "_" . $_FILES['archivo']['name'];
-        $rutaDestino = "subirArch/" . $nombreArchivo; // donde se guardan archivitos
+        $rutaDestino = "subirArch/" . $nombreArchivo;
         move_uploaded_file($_FILES['archivo']['tmp_name'], $rutaDestino);
 
-        // carga docenteee
-        $stmtCarga = $pdo->prepare("SELECT id_carga_academica FROM carga_academica WHERE id_docente = ?");
-        $stmtCarga->execute([$id_docente]);
-        $carga = $stmtCarga->fetch(PDO::FETCH_ASSOC);
-
-        //guardamos
-        if($carga) {
-            $id_carga_academica = $carga['id_carga_academica'];
-
-            // guardar lo q se puso
-            $sql = "INSERT INTO aula_virtual_materiales (id_carga_academica, titulo, tipo, ruta_archivo, fecha_limite)
-                    VALUES (?, ?, ?, ?, ?)";
+        
+        if($id_carga_academica > 0) {
+            $sql = "CALL sp_subir_material_aula(?, ?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$id_carga_academica, $titulo, $tipo, $rutaDestino, $fecha_limite]);
 
@@ -53,13 +53,8 @@ if(isset($_POST['subir'])) {
     }
 }
 
-// materia del docente
-$stmtCarga = $pdo->prepare("SELECT id_carga_academica FROM carga_academica WHERE id_docente = ?");
-$stmtCarga->execute([$id_docente]);
-$carga = $stmtCarga->fetch(PDO::FETCH_ASSOC);
-$id_carga_academica = $carga['id_carga_academica'] ?? 0;
 
-$sql = "SELECT * FROM aula_virtual_materiales WHERE id_carga_academica = ?";
+$sql = "CALL sp_obtener_materiales_aula(?)";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$id_carga_academica]);
 $materiales = $stmt->fetchAll(PDO::FETCH_ASSOC);

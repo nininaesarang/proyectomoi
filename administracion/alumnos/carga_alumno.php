@@ -21,16 +21,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         $pdo->beginTransaction();
 
-        $sql_delete = "DELETE FROM carga_alumnos WHERE id_alumno = ?";
+        $sql_delete = "CALL sp_eliminar_carga_alumno(?)";
         $stmt_delete = $pdo->prepare($sql_delete);
         $stmt_delete->execute([$id_alumno]);
+        $stmt_delete->closeCursor();
 
  
         if (!empty($materias_seleccionadas)) {
-            $sql_insert = "INSERT INTO carga_alumnos (id_alumno, id_carga_academica) VALUES (?, ?)";
+            $sql_insert = "CALL sp_insertar_carga_alumno(?, ?)";
             $stmt_insert = $pdo->prepare($sql_insert);
             foreach ($materias_seleccionadas as $id_carga) {
                 $stmt_insert->execute([$id_alumno, $id_carga]);
+                $stmt_insert->closeCursor();
             }
         }
 
@@ -42,21 +44,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-$stmt_alum = $pdo->prepare("SELECT matricula, nombre_completo, semestre_actual FROM alumnos WHERE id_alumno = ?");
+$stmt_alum = $pdo->prepare("CALL sp_obtener_info_alumno_carga(?)");
 $stmt_alum->execute([$id_alumno]);
 $alumno = $stmt_alum->fetch();
+$stmt_alum->closeCursor();
 
-$sql_clases = "SELECT ca.id_carga_academica, m.nombre_materia, m.creditos, d.nombre_completo AS profe, g.nombre_grupo, c.nombre_periodo 
-               FROM carga_academica ca
-               INNER JOIN materias m ON ca.id_materia = m.id_materia
-               INNER JOIN docentes d ON ca.id_docente = d.id_docente
-               INNER JOIN grupos g ON ca.id_grupo = g.id_grupo
-               INNER JOIN ciclos_escolares c ON ca.id_ciclo = c.id_ciclo
-               ORDER BY g.nombre_grupo ASC, m.nombre_materia ASC";
+$sql_clases = "CALL sp_obtener_clases_abiertas()";
 $clases_abiertas = $pdo->query($sql_clases)->fetchAll();
 
 
-$stmt_inscritas = $pdo->prepare("SELECT id_carga_academica FROM carga_alumnos WHERE id_alumno = ?");
+$stmt_inscritas = $pdo->prepare("CALL sp_obtener_materias_inscritas(?)");
 $stmt_inscritas->execute([$id_alumno]);
 $inscritas_array = $stmt_inscritas->fetchAll(PDO::FETCH_COLUMN);
 ?>

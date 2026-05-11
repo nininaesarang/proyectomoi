@@ -15,7 +15,7 @@ if (!$id_alumno) {
 }
 
 
-$stmt_alum = $pdo->prepare("SELECT matricula, nombre_completo, carrera, semestre_actual FROM alumnos WHERE id_alumno = ?");
+$stmt_alum = $pdo->prepare("CALL sp_obtener_info_alumno_kardex(?)");
 $stmt_alum->execute([$id_alumno]);
 $alumno = $stmt_alum->fetch();
 
@@ -25,12 +25,7 @@ if (!$alumno) {
 }
 
 
-$sql_kardex = "SELECT k.*, m.nombre_materia, m.creditos, c.nombre_periodo 
-               FROM kardex k
-               INNER JOIN materias m ON k.id_materia = m.id_materia
-               INNER JOIN ciclos_escolares c ON k.id_ciclo = c.id_ciclo
-               WHERE k.id_alumno = ?
-               ORDER BY c.id_ciclo ASC, m.nombre_materia ASC";
+$sql_kardex = "CALL sp_obtener_kardex_detallado_alumno(?)";
 $stmt_kardex = $pdo->prepare($sql_kardex);
 $stmt_kardex->execute([$id_alumno]);
 $kardex = $stmt_kardex->fetchAll();

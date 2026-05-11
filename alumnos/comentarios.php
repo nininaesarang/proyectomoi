@@ -10,7 +10,7 @@ if(!isset($_SESSION['id_usuario']) || $_SESSION['rol'] != 'alumno'){
 $id_usuario = $_SESSION['id_usuario'];
 
 try {
-    $stmtAl = $pdo->prepare("SELECT id_alumno FROM alumnos WHERE id_usuario = ? LIMIT 1");
+    $stmtAl = $pdo->prepare("CALL sp_obtener_id_alumno_por_usuario(?)");
     $stmtAl->execute([$id_usuario]);
     $alumno = $stmtAl->fetch(PDO::FETCH_ASSOC);
 
@@ -19,13 +19,7 @@ try {
     }
 
     $id_alumno = $alumno['id_alumno'];
-    $stmt = $pdo->prepare("
-        SELECT m.asunto, m.mensaje, m.fecha_envio, d.nombre_completo
-        FROM mensajes m
-        INNER JOIN docentes d ON m.id_docente = d.id_docente
-        WHERE m.id_alumno = ?
-        ORDER BY m.fecha_envio DESC
-    ");
+    $stmt = $pdo->prepare("CALL sp_obtener_mensajes_alumno(?)");
     $stmt->execute([$id_alumno]);
     $mensajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if($reinscripcion){
         try {
-            $stmt_id = $pdo->prepare("SELECT id_alumno FROM alumnos WHERE id_usuario = ?");
+            $stmt_id = $pdo->prepare("CALL sp_obtener_id_alumno_por_usuario(?)");
             $stmt_id->execute([$id_logueado]);
             $alumno = $stmt_id->fetch(PDO::FETCH_ASSOC);
             $id_alumno = $alumno['id_alumno'] ?? null;
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($id_alumno) {
                 $pdo->beginTransaction();
                 
-                $sql = "UPDATE actividades_complementarias SET nombre_actividad = ? WHERE id_alumno = ?";
+                $sql = "CALL sp_actualizar_club_alumno(?, ?)";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([$reinscripcion, $id_alumno]);
                 
@@ -44,13 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 try {
-    $sql_club =
-    "SELECT a.*, g.nombre_grupo, u.correo, ac.nombre_actividad
-    FROM alumnos a 
-    LEFT JOIN usuarios u ON a.id_usuario = u.id_usuario 
-    LEFT JOIN grupos g ON a.id_grupo = g.id_grupo
-    left join actividades_complementarias ac on a.id_alumno = ac.id_alumno
-    WHERE a.id_usuario = ?";
+    $sql_club = "CALL sp_obtener_perfil_club_alumno(?)";
     $stmt_c = $pdo->prepare($sql_club);
     $stmt_c->execute([$id_logueado]);
     $club = $stmt_c->fetch(PDO::FETCH_ASSOC);

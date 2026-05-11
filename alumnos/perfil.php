@@ -14,26 +14,11 @@ if(!isset($_SESSION['id_usuario'])){
 $id_logueado = $_SESSION['id_usuario'];
 
 try{
-    $sql = "SELECT a.id_alumno,
-    a.id_usuario,
-    a.matricula,
-    a.carrera,
-    a.semestre_actual,
-    u.correo,
-    a.telefono,
-    a.estatus,
-    a.creditos,
-    g.nombre_grupo
-    FROM
-    alumnos a
-    left join
-    grupos g on a.id_grupo = g.id_grupo
-    left join
-    usuarios u on a.id_usuario = u.id_usuario
-    where a.id_usuario= ?";
+    $sql = "CALL sp_obtener_perfil_alumno(?)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id_logueado]);
     $perfil = $stmt->fetch(PDO::FETCH_ASSOC);
+    
     if (!$perfil) {
         $perfil = [
             'matricula' => 'No disponible',

@@ -10,21 +10,17 @@ include '../conexion.php';
 
 
 try {
-    $total_alumnos = $pdo->query("SELECT COUNT(*) FROM alumnos WHERE estatus = 'Activo'")->fetchColumn();
-    $total_docentes = $pdo->query("SELECT COUNT(*) FROM docentes WHERE estatus = 'Activo'")->fetchColumn();
-    $total_materias = $pdo->query("SELECT COUNT(*) FROM materias")->fetchColumn();
-    $total_grupos = $pdo->query("SELECT COUNT(*) FROM grupos")->fetchColumn();
+    $total_alumnos = $pdo->query("CALL sp_contar_alumnos_activos()")->fetchColumn();
+    $total_docentes = $pdo->query("CALL sp_contar_docentes_activos()")->fetchColumn();
+    $total_materias = $pdo->query("CALL sp_contar_materias()")->fetchColumn();
+    $total_grupos = $pdo->query("CALL sp_contar_grupos()")->fetchColumn();
 } catch (PDOException $e) {
     echo "Error en los contadores: " . $e->getMessage();
 }
 
 
 try {
-    $sql_grupos = "SELECT g.nombre_grupo, c.nombre_periodo, 
-                   (SELECT COUNT(*) FROM alumnos a WHERE a.id_grupo = g.id_grupo AND a.estatus = 'Activo') as cantidad_alumnos
-                   FROM grupos g
-                   LEFT JOIN ciclos_escolares c ON g.id_ciclo = c.id_ciclo
-                   ORDER BY g.id_grupo DESC";
+    $sql_grupos = "CALL sp_obtener_reporte_grupos()";
     $lista_grupos = $pdo->query($sql_grupos)->fetchAll();
 } catch (PDOException $e) {
     echo "Error al cargar los grupos: " . $e->getMessage();
