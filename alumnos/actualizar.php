@@ -58,6 +58,7 @@ try {
     }
 } catch(PDOException $e) {
     $error_message = "Error en el sistema: " . $e->getMessage();
+    $tiene_registro_ss = false;
 }
 ?>
 

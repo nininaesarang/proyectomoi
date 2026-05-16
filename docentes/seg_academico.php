@@ -9,9 +9,10 @@ if(!isset($_SESSION['id_usuario'])){
 
 $id_usuario = $_SESSION['id_usuario']; 
 
-$stmtDoc = $pdo->prepare("SELECT id_docente FROM docentes WHERE id_usuario = ?");
+$stmtDoc = $pdo->prepare("call consultar_docente(?)");
 $stmtDoc->execute([$id_usuario]);
 $docente = $stmtDoc->fetch(PDO::FETCH_ASSOC);
+$stmtDoc->closeCursor();
 
 if(!$docente){
     die("Error: Este usuario no está registrado como docente");
@@ -30,28 +31,14 @@ if(isset($_POST['enviar_mensaje'])){
     $asunto = $_POST['asunto'];
     $mensaje = $_POST['mensaje'];
 
-    $stmt = $pdo->prepare("INSERT INTO mensajes (id_docente, id_alumno, asunto, mensaje) VALUES (?,?,?,?)");
+    $stmt = $pdo->prepare("call enviar_mensaje(?, ?, ?, ?)");
     $stmt->execute([$id_docente, $id_alumno, $asunto, $mensaje]);
 
     echo "<p style='color:green;'>Mensaje enviado al alumno</p>";
 }
 
 //Consultita
-$sql = "SELECT 
-    alumnos.id_alumno,alumnos.matricula,alumnos.carrera,calificaciones_activas.promedio_final,
-    seguimiento_academico.obersevaciones,
-    seguimiento_academico.nivel_riesgo,
-    alumnos.nombre_completo,
-    usuarios.correo
-FROM alumnos
-LEFT JOIN calificaciones_activas ON calificaciones_activas.id_alumno = alumnos.id_alumno
-LEFT JOIN seguimiento_academico 
-    ON seguimiento_academico.id_alumno = alumnos.id_alumno
-    AND seguimiento_academico.id_docente = ?
-LEFT JOIN usuarios ON usuarios.id_usuario = alumnos.id_usuario
-ORDER BY alumnos.matricula";
-
-$stmt = $pdo->prepare($sql);
+$stmt = $pdo->prepare("call cosnultar_alumnos(?)");
 $stmt->execute([$id_docente]);
 $alumnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>

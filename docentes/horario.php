@@ -5,30 +5,17 @@ require '../conexion.php';
 //busacamos q user es
 $id_usuario = $_SESSION['id_usuario'];
 
-$sql_docente = "SELECT id_docente FROM docentes WHERE id_usuario = ?";
-$stmt = $pdo->prepare($sql_docente);
+$stmt = $pdo->prepare("CALL consultar_docente(?)");
 $stmt->execute([$id_usuario]);
-$docente = $stmt->fetch();
+$docente = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $id_docente = $docente['id_docente'];
 
 // consultita
-$sql = "SELECT 
-    materias.nombre_materia,grupos.nombre_grupo,horarios.dia_semana,horarios.hora_inicio,
-    horarios.hora_fin,
-    horarios.aula
-FROM horarios
-JOIN carga_academica 
-    ON horarios.id_carga_academica = carga_academica.id_carga_academica
-JOIN materias 
-    ON carga_academica.id_materia = materias.id_materia
-JOIN grupos 
-    ON carga_academica.id_grupo = grupos.id_grupo
-WHERE carga_academica.id_docente = ?";
-
-$stmt = $pdo->prepare($sql);
+$stmt = $pdo->prepare("CALL consultar_horario_docente(?)");
 $stmt->execute([$id_docente]);
-$horario = $stmt->fetchAll();
+$horario = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
 ?>
 
 

@@ -4,91 +4,53 @@ require '../conexion.php';
 
 $id_usuario = $_SESSION['id_usuario'];
 
-$sql_docente = "SELECT id_docente FROM docentes WHERE id_usuario = ?";
-$stmt = $pdo->prepare($sql_docente);
+$stmt = $pdo->prepare("CALL consultar_docente(?);");
 $stmt->execute([$id_usuario]);
 
 //se trae
-$docente = $stmt->fetch();
+$docente = $stmt->fetch(PDO::FETCH_ASSOC);
 $id_docente = $docente['id_docente'] ?? 0;
 
-// Alumnitos
-$sql_alumnos = "SELECT alumnos.id_alumno,
-       alumnos.matricula, nombre_completo,
-       alumnos.semestre_actual
-FROM alumnos
-JOIN usuarios ON usuarios.id_usuario = alumnos.id_usuario
-JOIN carga_academica ON carga_academica.id_grupo = alumnos.id_grupo
-WHERE carga_academica.id_docente = ?
-ORDER BY alumnos.semestre_actual, alumnos.matricula";
-
-$stmt = $pdo->prepare($sql_alumnos);
+// traer alumnitos
+$stmt = $pdo->prepare("call traer_alumnos(?)");
 $stmt->execute([$id_docente]);
 $alumnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//mandar la asistencia
- //hacer clic
-if(isset($_POST['guardar_asistencia'])){
-    //assitencitas por dia
-    foreach($_POST['asistencia'] as $id_alumno => $estatus){
-        $fecha = date('Y-m-d H:i:s');
-
-       // guardar en tablita
-        $sql_insert = "INSERT INTO asistencias (id_alumno, id_carga_academica, fecha, estatus)
-                       VALUES (?, ?, ?, ?)";
-        $stmt = $pdo->prepare($sql_insert);
-
-        //ejecutanos
-        $stmt->execute([$id_alumno, $_POST['id_carga_academica'], $fecha, $estatus]);
-    }
-
-    //se guardo bien y todo
-    echo "<p style='color:green'>Asistencias registradas correctamente.</p>";
-}
-
 // Traer carga academicaa
-$sql_carga = "SELECT * FROM carga_academica WHERE id_docente = ? LIMIT 1";
-
 //conusultita
-$stmt = $pdo->prepare($sql_carga);
+$stmt = $pdo->prepare("call traer_carga_academica(?)");
 //id del prof que se logeo
 $stmt->execute([$id_docente]);
-$carga = $stmt->fetch();
+$carga = $stmt->fetch(PDO::FETCH_ASSOC);
 //guardar
 $id_carga = $carga['id_carga_academica'] ?? 0;
 
-// aistencia
+//mandar la asistencia
+ //hacer clic
+// --- GUARDAR ASISTENCIA ---
+if(isset($_POST['guardar_asistencia'])){
+    try {
+        $stmt = $pdo->prepare("CALL sp_registrar_asistencia(?, ?, ?)");
+        foreach($_POST['asistencia'] as $id_alumno => $estatus){
+            $stmt->execute([$id_alumno, $_POST['id_carga_academica'], $estatus]);
+            $stmt->closeCursor(); // Vital para el loop
+        }
+        $msg = "Asistencias registradas correctamente.";
+    } catch(Exception $e) {
+        $error = $e->getMessage();
+    }
+}
 
-//contamos segun a lo q le demos clic
-$sql_historial = "
-SELECT id_alumno,
-
-
-       SUM(CASE WHEN estatus='Faltó' THEN 1 ELSE 0 END) AS faltas,
-       SUM(CASE WHEN estatus='Retardo' THEN 1 ELSE 0 END) AS retardos,
-       COUNT(*) AS total
-FROM asistencias
-WHERE id_carga_academica = ?
-GROUP BY id_alumno
-";
-
-//preparamos y ejectams
-$stmt = $pdo->prepare($sql_historial);
-$stmt->execute([$id_carga]);
+// --- OBTENER ESTADÍSTICAS ---
 $historial = [];
-while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-    $faltas = $row['faltas'];
-    $total = $row['total'];
-    $porcentaje = $total > 0 ? round((($total - $faltas)/$total)*100,2) : 100;
-    $estado = $porcentaje < 70 ? "En riesgo" : "Normal";
-
-    //guarda aui
-    $historial[$row['id_alumno']] = [
-        'faltas' => $faltas,
-        'retardos' => $row['retardos'],
-        'porcentaje' => $porcentaje,
-        'estado' => $estado
-    ];
+if($id_carga > 0) {
+    $stmt = $pdo->prepare("CALL sp_get_reporte_asistencias(?)");
+    $stmt->execute([$id_carga]);
+    
+    // Ya no necesitas el cálculo manual en el while, SQL ya te dio todo
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+        $historial[$row['id_alumno']] = $row; 
+    }
 }
 ?>
 <!DOCTYPE html>
